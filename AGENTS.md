@@ -27,6 +27,6 @@ This is a Neovim Lua plugin - no build system required. Test by loading in Neovi
 - Commands: PascalCase with plugin prefix (`OpencodeSendBuffer`)
 
 ### Plugin Structure
-- Main logic in `lua/opencode/init.lua`
+- Main logic in `lua/opencode-context/init.lua`
 - Commands and keymaps in `plugin/opencode.lua`
 - Use guard clause pattern for plugin loading

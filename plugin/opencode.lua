@@ -11,9 +11,16 @@ end, {
   desc = "Send prompt to opencode with placeholder support"
 })
 
+vim.api.nvim_create_user_command("OpencodeSwitchMode", function()
+  opencode.toggle_mode()
+end, {
+  desc = "Toggle opencode between planning and build mode"
+})
+
 local function create_keymaps()
   vim.keymap.set("n", "<leader>oc", opencode.send_prompt, { desc = "Send prompt to opencode" })
   vim.keymap.set("v", "<leader>oc", opencode.send_prompt, { desc = "Send prompt to opencode" })
+  vim.keymap.set("n", "<leader>om", opencode.toggle_mode, { desc = "Toggle opencode mode" })
 end
 
 vim.api.nvim_create_autocmd("VimEnter", {

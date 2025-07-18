@@ -34,8 +34,9 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
   keys = {
     { "<leader>oc", "<cmd>OpencodeSend<cr>", desc = "Send prompt to opencode" },
     { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = "v", desc = "Send prompt to opencode" },
+    { "<leader>om", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
   },
-  cmd = { "OpencodeSend" },
+  cmd = { "OpencodeSend", "OpencodeSwitchMode" },
 }
 ```
 
@@ -68,6 +69,7 @@ require('opencode-context').setup({
 -- Keymaps
 vim.keymap.set("n", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
 vim.keymap.set("v", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
+vim.keymap.set("n", "<leader>om", "<cmd>OpencodeSwitchMode<cr>", { desc = "Toggle opencode mode" })
 EOF
 ```
 
@@ -105,10 +107,12 @@ EOF
 ### Commands
 
 - `:OpencodeSend` - Open prompt input for opencode with placeholder support
+- `:OpencodeSwitchMode` - Toggle opencode between planning and build mode
 
-### Default Keymap
+### Default Keymaps
 
 - `<leader>oc` - Open prompt input (works in normal and visual mode)
+- `<leader>om` - Toggle opencode mode (planning ↔ build)
 
 ### Placeholders
 

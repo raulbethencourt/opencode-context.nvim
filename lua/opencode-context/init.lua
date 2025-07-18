@@ -18,8 +18,9 @@ local function get_buffers_paths()
 	local buffers = vim.api.nvim_list_bufs()
 	local file_paths = {}
 
-  for _, bufnr in ipairs(buffers) do
-    if vim.bo[bufnr].buflisted then			local filename = vim.api.nvim_buf_get_name(bufnr)
+	for _, bufnr in ipairs(buffers) do
+		if vim.bo[bufnr].buflisted then
+			local filename = vim.api.nvim_buf_get_name(bufnr)
 			if filename and filename ~= "" then
 				-- Convert to relative path from cwd
 				local relative_path = vim.fn.fnamemodify(filename, ":~:.")
@@ -70,7 +71,6 @@ end
 
 local function get_diagnostics()
 	local bufnr = vim.api.nvim_get_current_buf()
-	local filename = vim.api.nvim_buf_get_name(bufnr)
 	local cursor = vim.api.nvim_win_get_cursor(0)
 	local current_line = cursor[1] - 1 -- Convert to 0-based indexing
 
@@ -212,7 +212,7 @@ end
 
 function M.send_prompt()
 	vim.ui.input({
-		prompt = "Enter prompt for opencode (use @file, @cursor, @selection, @diagnostics): ",
+		prompt = "Enter prompt for opencode (use @file, @buffers, @cursor, @selection, @diagnostics): ",
 		default = "",
 	}, function(input)
 		if not input or input == "" then
@@ -224,9 +224,31 @@ function M.send_prompt()
 	end)
 end
 
+function M.toggle_mode()
+	local pane = find_opencode_pane()
+	if not pane then
+		vim.notify(
+			"No opencode pane found in current window. Make sure opencode is running in a pane in this tmux window.",
+			vim.log.levels.ERROR
+		)
+		return false
+	end
+
+	-- Send tab key to toggle between planning/build mode
+	local cmd = string.format("tmux send-keys -t %s Tab", pane)
+	vim.fn.system(cmd)
+
+	if vim.v.shell_error == 0 then
+		vim.notify(string.format("Toggled opencode mode (%s)", pane), vim.log.levels.INFO)
+		return true
+	else
+		vim.notify("Failed to toggle opencode mode", vim.log.levels.ERROR)
+		return false
+	end
+end
+
 function M.setup(opts)
 	M.config = vim.tbl_deep_extend("force", M.config, opts or {})
 end
 
 return M
-
