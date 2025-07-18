@@ -1,4 +1,5 @@
 local M = {}
+local ui = require("opencode-context.ui")
 
 M.config = {
 	-- Tmux settings
@@ -24,7 +25,9 @@ local function get_buffers_paths()
 			if filename and filename ~= "" then
 				-- Convert to relative path from cwd
 				local relative_path = vim.fn.fnamemodify(filename, ":~:.")
-				table.insert(file_paths, relative_path)
+				if relative_path and relative_path ~= "" then
+					table.insert(file_paths, relative_path)
+				end
 			end
 		end
 	end
@@ -36,13 +39,38 @@ local function get_buffers_paths()
 	return table.concat(file_paths, ", ")
 end
 
-local function get_cursor_info()
-	local bufnr = vim.api.nvim_get_current_buf()
+-- returns the buffer, relative file path and cursor
+local function get_cursor()
+	local function is_floating(winid)
+		local config = vim.api.nvim_win_get_config(winid)
+		return config.relative ~= ""
+	end
+
+	local current_win = vim.api.nvim_get_current_win()
+	local target_win = current_win
+
+	if is_floating(current_win) then
+		local prev_winnr = vim.fn.winnr("#")
+		local prev_winid = vim.fn.win_getid(prev_winnr)
+
+		if prev_winid ~= 0 and vim.api.nvim_win_is_valid(prev_winid) then
+			target_win = prev_winid
+		end
+	end
+
+	local bufnr = vim.api.nvim_win_get_buf(target_win)
 	local filename = vim.api.nvim_buf_get_name(bufnr)
-	local cursor = vim.api.nvim_win_get_cursor(0)
+	local relative_path = vim.fn.fnamemodify(filename, ":~:.")
+	local cursor = vim.api.nvim_win_get_cursor(target_win)
+	return bufnr, relative_path, cursor
+end
+
+local function get_cursor_info()
+	local _, relative_path, cursor = get_cursor()
 	local line_num = cursor[1]
 	local col_num = cursor[2] + 1
-	return string.format("File: %s, Line: %d, Column: %d", filename, line_num, col_num)
+
+	return string.format("%s, Line: %d, Column: %d", relative_path, line_num, col_num)
 end
 
 local function get_visual_selection()
@@ -50,6 +78,7 @@ local function get_visual_selection()
 	local end_pos = vim.fn.getpos("'>")
 	local bufnr = vim.api.nvim_get_current_buf()
 	local filename = vim.api.nvim_buf_get_name(bufnr)
+	local relative_path = vim.fn.fnamemodify(filename, ":~:.")
 
 	local start_line = start_pos[2] - 1
 	local end_line = end_pos[2]
@@ -66,22 +95,39 @@ local function get_visual_selection()
 	end
 
 	local selection = table.concat(lines, "\n")
-	return string.format("File: %s (lines %d-%d)\n\n%s", filename, start_line + 1, end_line, selection)
+
+	return relative_path, start_line, end_line, selection
+end
+
+-- returns the file, range and contents of the visual selection
+local function get_selection()
+	local relative_path, start_line, end_line, selection = get_visual_selection()
+
+	return string.format("%s (lines %d-%d) - `%s`", relative_path, start_line + 1, end_line, selection)
+end
+
+-- returns the file and range of the visual selection
+local function get_visual_range()
+	local relative_path, start_line, end_line, _ = get_visual_selection()
+
+	return string.format("%s (lines %d-%d)", relative_path, start_line + 1, end_line)
 end
 
 local function get_diagnostics()
-	local bufnr = vim.api.nvim_get_current_buf()
-	local cursor = vim.api.nvim_win_get_cursor(0)
+	local bufnr, relative_path, cursor = get_cursor()
 	local current_line = cursor[1] - 1 -- Convert to 0-based indexing
 
 	-- Get diagnostics for current line only
 	local diagnostics = vim.diagnostic.get(bufnr, { lnum = current_line })
 
 	if #diagnostics == 0 then
-		return "No diagnostics found on current line"
+		return ""
 	end
 
 	local content_parts = {}
+
+	-- Add file context at the beginning
+	table.insert(content_parts, string.format("File: %s", relative_path))
 
 	for _, diagnostic in ipairs(diagnostics) do
 		local severity = vim.diagnostic.severity[diagnostic.severity]
@@ -97,15 +143,17 @@ local function get_diagnostics()
 		table.insert(content_parts, message)
 	end
 
-	return table.concat(content_parts, ", ")
+	return table.concat(content_parts, "\n")
 end
 
 local function replace_placeholders(prompt)
 	local replacements = {
 		["@buffers"] = get_buffers_paths, -- Process @buffers FIRST
 		["@file"] = get_current_file_path, -- Then @file
-		["@selection"] = get_visual_selection,
+		["@selection"] = get_selection,
+		["@range"] = get_visual_range,
 		["@diagnostics"] = get_diagnostics,
+		["@here"] = get_cursor_info,
 		["@cursor"] = get_cursor_info,
 	}
 
@@ -245,6 +293,26 @@ function M.toggle_mode()
 		vim.notify("Failed to toggle opencode mode", vim.log.levels.ERROR)
 		return false
 	end
+end
+
+-- Create a callback that processes placeholders and sends to opencode
+local function create_send_callback()
+	return function(prompt)
+		local processed_prompt = replace_placeholders(prompt)
+		return send_to_opencode(processed_prompt)
+	end
+end
+
+function M.show_persistent_prompt()
+	ui.show_persistent_prompt(create_send_callback())
+end
+
+function M.hide_persistent_prompt()
+	ui.hide_persistent_prompt()
+end
+
+function M.toggle_persistent_prompt()
+	ui.toggle_persistent_prompt(create_send_callback())
 end
 
 function M.setup(opts)

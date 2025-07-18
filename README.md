@@ -34,7 +34,8 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
   keys = {
     { "<leader>oc", "<cmd>OpencodeSend<cr>", desc = "Send prompt to opencode" },
     { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = "v", desc = "Send prompt to opencode" },
-    { "<leader>om", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
+    { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
+    { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
   },
   cmd = { "OpencodeSend", "OpencodeSwitchMode" },
 }
@@ -69,7 +70,8 @@ require('opencode-context').setup({
 -- Keymaps
 vim.keymap.set("n", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
 vim.keymap.set("v", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
-vim.keymap.set("n", "<leader>om", "<cmd>OpencodeSwitchMode<cr>", { desc = "Toggle opencode mode" })
+vim.keymap.set("n", "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", { desc = "Toggle opencode mode" })
+vim.keymap.set("n", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open opencode persistent prompt" })
 EOF
 ```
 
@@ -90,11 +92,13 @@ EOF
 ### Manual Installation
 
 1. Clone the repository to your Neovim configuration directory:
+
    ```bash
    git clone https://github.com/cousine/opencode-context.nvim ~/.config/nvim/pack/plugins/start/opencode-context.nvim
    ```
 
 2. Add to your `init.lua`:
+
    ```lua
    require("opencode-context").setup({
      tmux_target = nil,
@@ -108,6 +112,7 @@ EOF
 
 - `:OpencodeSend` - Open prompt input for opencode with placeholder support
 - `:OpencodeSwitchMode` - Toggle opencode between planning and build mode
+- `:OpencodePrompt` - Open opencode persistent prompt
 
 ### Default Keymaps
 
@@ -121,7 +126,9 @@ Use these placeholders in your prompts to include context:
 - `@file` - Includes the current file path (relative to working directory)
 - `@buffers` - Includes all buffer file paths (relative to working directory)
 - `@cursor` - Includes cursor position (file, line, column)
-- `@selection` - Includes the current visual selection
+- `@here` - Alias to @cursor
+- `@selection` - Includes the current visual selection content
+- `@range` - Includes the current visual selection range
 - `@diagnostics` - Includes LSP diagnostics for current line
 
 ### Example Prompts
@@ -148,7 +155,7 @@ Use these placeholders in your prompts to include context:
 ```lua
 require("opencode-context").setup({
   -- Tmux settings
-  tmux_target = nil,  -- Manual override: "main:1.0" 
+  tmux_target = nil,  -- Manual override: "main:1.0"
   auto_detect_pane = true,  -- Auto-find opencode pane in current window (default: true)
 })
 ```
@@ -163,7 +170,9 @@ The plugin integrates directly with tmux to send messages to your running openco
 4. **No new processes** - uses your existing opencode session
 
 ### Detection Strategy
+
 The plugin searches for opencode panes **only in the current tmux window** using:
+
 - Current command is `opencode`
 - Pane title contains "opencode"
 - Recent command history contains opencode
