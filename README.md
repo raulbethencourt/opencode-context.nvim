@@ -1,6 +1,6 @@
 # opencode-context.nvim
 
-A Neovim plugin that enables seamless context sharing with running opencode sessions. Send your current buffer, all open buffers, visual selections, or diagnostics directly to opencode for AI-assisted development.
+A Neovim plugin that enables seamless context sharing with running opencode sessions inside Tmux. Send your current buffer, all open buffers, visual selections, or diagnostics directly to opencode running in a Tmux pane for AI-assisted development.
 
 ## Features
 
@@ -8,8 +8,8 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
 - 🔄 Smart placeholder replacement system
 - 📄 `@file` - Insert current file path (relative)
 - 📁 `@buffers` - Insert all buffer file paths (relative)
-- 📍 `@cursor` - Insert cursor position info
-- ✂️ `@selection` - Insert visual selection
+- 📍 `@cursor`, `@here` - Insert cursor position info
+- ✂️ `@selection`, `@range` - Insert visual selection
 - 🔍 `@diagnostics` - Insert LSP diagnostics
 - 🖥️ **Tmux integration** - Send directly to opencode pane in current window
 - ⚡ LazyVim compatible with lazy loading
