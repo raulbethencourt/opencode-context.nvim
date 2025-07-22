@@ -74,11 +74,28 @@ local function get_cursor_info()
 end
 
 local function get_visual_selection()
-	local start_pos = vim.fn.getpos("'<")
-	local end_pos = vim.fn.getpos("'>")
 	local bufnr = vim.api.nvim_get_current_buf()
 	local filename = vim.api.nvim_buf_get_name(bufnr)
 	local relative_path = vim.fn.fnamemodify(filename, ":~:.")
+
+	local start_pos, end_pos
+
+	-- Check if we're currently in visual mode
+	local mode = vim.fn.mode()
+	if mode == "v" or mode == "V" or mode == "\22" then -- \22 is visual block mode
+		-- In visual mode, use current selection
+		start_pos = vim.fn.getpos("v")
+		end_pos = vim.fn.getpos(".")
+
+		-- Ensure start comes before end
+		if start_pos[2] > end_pos[2] or (start_pos[2] == end_pos[2] and start_pos[3] > end_pos[3]) then
+			start_pos, end_pos = end_pos, start_pos
+		end
+	else
+		-- Not in visual mode, use marks from last visual selection
+		start_pos = vim.fn.getpos("'<")
+		end_pos = vim.fn.getpos("'>")
+	end
 
 	local start_line = start_pos[2] - 1
 	local end_line = end_pos[2]
@@ -259,9 +276,16 @@ local function send_to_opencode(message)
 end
 
 function M.send_prompt()
+	-- Check if we're in visual mode and pre-populate with @selection
+	local mode = vim.fn.mode()
+	local default_text = ""
+	if mode == "v" or mode == "V" or mode == "\22" then -- \22 is visual block mode
+		default_text = "@selection "
+	end
+
 	vim.ui.input({
 		prompt = "Enter prompt for opencode (use @file, @buffers, @cursor, @selection, @diagnostics): ",
-		default = "",
+		default = default_text,
 	}, function(input)
 		if not input or input == "" then
 			return
