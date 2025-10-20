@@ -75,6 +75,45 @@ vim.keymap.set("n", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open open
 EOF
 ```
 
+### lazy.nvim with UI Configuration
+
+For advanced UI customization with lazy.nvim:
+
+```lua
+{
+  "cousine/opencode-context.nvim",
+  opts = {
+    -- Tmux settings
+    tmux_target = nil,
+    auto_detect_pane = true,
+
+    -- UI settings (place ui inside opts, not at top level)
+    ui = {
+      window_type = "float",  -- "float" or "split"
+      float = {
+        width = 0.6,          -- 60% of editor width
+        height = 1,           -- 1 line height
+        border = "rounded",   -- Rounded border style
+        position = "center",  -- Center the window
+        margin = 2,           -- 2 line margin
+      },
+      split = {
+        position = "bottom",  -- "top", "bottom", "left", "right"
+        size = 8,             -- Split size
+      },
+    },
+  },
+  keys = {
+    { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
+    { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
+    { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
+  },
+  cmd = { "OpencodeSend", "OpencodeSwitchMode", "OpencodePrompt" },
+}
+```
+
+**Important**: The `ui` configuration must be placed inside the `opts` table, not at the top level of the lazy config.
+
 ### dein.vim
 
 ```vim
@@ -85,6 +124,16 @@ lua << EOF
 require('opencode-context').setup({
   tmux_target = nil,
   auto_detect_pane = true,
+  ui = {
+    window_type = "float",
+    float = {
+      width = 0.9,
+      height = 1,
+      border = "solid",
+      position = "bottom",
+      margin = 2,
+    },
+  },
 })
 EOF
 ```
@@ -93,18 +142,28 @@ EOF
 
 1. Clone the repository to your Neovim configuration directory:
 
-   ```bash
-   git clone https://github.com/cousine/opencode-context.nvim ~/.config/nvim/pack/plugins/start/opencode-context.nvim
-   ```
+    ```bash
+    git clone https://github.com/cousine/opencode-context.nvim ~/.config/nvim/pack/plugins/start/opencode-context.nvim
+    ```
 
 2. Add to your `init.lua`:
 
-   ```lua
-   require("opencode-context").setup({
-     tmux_target = nil,
-     auto_detect_pane = true,
-   })
-   ```
+    ```lua
+    require("opencode-context").setup({
+      tmux_target = nil,
+      auto_detect_pane = true,
+      ui = {
+        window_type = "float",
+        float = {
+          width = 0.9,
+          height = 1,
+          border = "solid",
+          position = "bottom",
+          margin = 2,
+        },
+      },
+    })
+    ```
 
 ## Usage
 
@@ -157,8 +216,41 @@ require("opencode-context").setup({
   -- Tmux settings
   tmux_target = nil,  -- Manual override: "main:1.0"
   auto_detect_pane = true,  -- Auto-find opencode pane in current window (default: true)
+
+  -- UI settings
+  ui = {
+    window_type = "float",  -- "float" or "split"
+    float = {
+      width = 0.9,          -- Percentage of editor width (0.0-1.0)
+      height = 1,           -- Number of lines (optional, default: 1)
+      border = "solid",     -- Border style: "none", "single", "double", "rounded", "solid", "shadow"
+      position = "bottom",  -- "top", "bottom", "center"
+      margin = 2,           -- Margin from edges (optional, default: 2)
+    },
+    split = {
+      position = "bottom",  -- "top", "bottom", "left", "right"
+      size = 8,             -- Number of lines/columns for split (optional, default: 8)
+    },
+  },
 })
 ```
+
+### UI Configuration Options
+
+The `ui` configuration allows you to customize the appearance and behavior of the prompt window:
+
+- **`window_type`**: Choose between `"float"` (floating window) or `"split"` (split window)
+- **Float window options**:
+  - `width`: Percentage of editor width (0.0-1.0)
+  - `height`: Number of lines (default: 1)
+  - `border`: Border style (`"none"`, `"single"`, `"double"`, `"rounded"`, `"solid"`, `"shadow"`)
+  - `position`: Window position (`"top"`, `"bottom"`, `"center"`)
+  - `margin`: Margin from screen edges (default: 2)
+- **Split window options**:
+  - `position`: Split position (`"top"`, `"bottom"`, `"left"`, `"right"`)
+  - `size`: Number of lines/columns (default: 8)
+
+All UI options are optional and will use sensible defaults if not specified.
 
 ## How It Works
 
@@ -206,6 +298,12 @@ tmux send-keys -t session:window.pane "test message" Enter
 # List all panes in current window
 tmux list-panes -F '#{session_name}:#{window_index}.#{pane_index} #{pane_current_command}'
 ```
+
+## Documentation
+
+Once installed, you can access the full documentation with: >
+    :help opencode-context
+<
 
 ## Contributing
 
