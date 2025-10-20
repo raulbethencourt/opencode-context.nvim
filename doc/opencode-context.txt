@@ -1,0 +1,320 @@
+*opencode-context.txt*  Neovim plugin for OpenCode integration
+
+==============================================================================
+CONTENTS                                                    *opencode-context*
+
+    1. Introduction ........................... |opencode-context-intro|
+    2. Installation ........................... |opencode-context-install|
+    3. Usage .................................. |opencode-context-usage|
+    4. Configuration ......................... |opencode-context-config|
+    5. Commands .............................. |opencode-context-commands|
+    6. Keymaps ............................... |opencode-context-keymaps|
+    7. Placeholders .......................... |opencode-context-placeholders|
+    8. Examples .............................. |opencode-context-examples|
+    9. Troubleshooting ....................... |opencode-context-troubleshooting|
+
+==============================================================================
+INTRODUCTION                                            *opencode-context-intro*
+
+opencode-context.nvim is a Neovim plugin that enables seamless context sharing
+with running OpenCode sessions inside Tmux. Send your current buffer, all open
+buffers, visual selections, or diagnostics directly to OpenCode running in a
+Tmux pane for AI-assisted development.
+
+Features:
+- Interactive prompt input for OpenCode
+- Smart placeholder replacement system
+- Tmux integration for direct pane communication
+- Configurable UI (floating or split windows)
+
+==============================================================================
+INSTALLATION                                          *opencode-context-install*
+
+Requirements:
+- Neovim >= 0.8.0
+- Tmux (required for sending messages to running OpenCode sessions)
+- OpenCode running in a pane within the same tmux window as Neovim
+
+------------------------------------------------------------------------------
+LAZY.NVIM                                               *opencode-context-lazy*
+
+For basic usage: >
+    {
+      "cousine/opencode-context.nvim",
+      opts = {
+        tmux_target = nil,
+        auto_detect_pane = true,
+      },
+      keys = {
+        { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
+        { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
+        { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
+      },
+      cmd = { "OpencodeSend", "OpencodeSwitchMode", "OpencodePrompt" },
+    }
+<
+
+For advanced UI customization: >
+    {
+      "cousine/opencode-context.nvim",
+      opts = {
+        -- Tmux settings
+        tmux_target = nil,
+        auto_detect_pane = true,
+
+        -- UI settings (place ui inside opts, not at top level)
+        ui = {
+          window_type = "float",  -- "float" or "split"
+          float = {
+            width = 0.6,          -- 60% of editor width
+            height = 1,           -- 1 line height
+            border = "rounded",   -- Rounded border style
+            position = "center",  -- Center the window
+            margin = 2,           -- 2 line margin
+          },
+          split = {
+            position = "bottom",  -- "top", "bottom", "left", "right"
+            size = 8,             -- Split size
+          },
+        },
+      },
+      keys = {
+        { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
+        { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
+        { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
+      },
+      cmd = { "OpencodeSend", "OpencodeSwitchMode", "OpencodePrompt" },
+    }
+<
+
+IMPORTANT: The `ui` configuration must be placed inside the `opts` table, not
+at the top level of the lazy config.
+
+------------------------------------------------------------------------------
+PACKER.NVIM                                             *opencode-context-packer*
+
+>
+    use {
+      'cousine/opencode-context.nvim',
+      config = function()
+        require('opencode-context').setup({
+          tmux_target = nil,
+          auto_detect_pane = true,
+        })
+      end
+    }
+<
+
+------------------------------------------------------------------------------
+VIM-PLUG                                               *opencode-context-vimplug*
+
+>
+    Plug 'cousine/opencode-context.nvim'
+
+    " Configuration in init.vim or init.lua
+    lua << EOF
+    require('opencode-context').setup({
+      tmux_target = nil,
+      auto_detect_pane = true,
+    })
+
+    -- Keymaps
+    vim.keymap.set("n", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
+    vim.keymap.set("v", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
+    vim.keymap.set("n", "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", { desc = "Toggle opencode mode" })
+    vim.keymap.set("n", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open opencode persistent prompt" })
+    EOF
+<
+
+------------------------------------------------------------------------------
+DEIN.VIM                                               *opencode-context-dein*
+
+>
+    call dein#add('cousine/opencode-context.nvim')
+
+    " Configuration
+    lua << EOF
+    require('opencode-context').setup({
+      tmux_target = nil,
+      auto_detect_pane = true,
+      ui = {
+        window_type = "float",
+        float = {
+          width = 0.9,
+          height = 1,
+          border = "solid",
+          position = "bottom",
+          margin = 2,
+        },
+      },
+    })
+    EOF
+<
+
+------------------------------------------------------------------------------
+MANUAL INSTALLATION                               *opencode-context-manual*
+
+1. Clone the repository to your Neovim configuration directory: >
+
+    git clone https://github.com/cousine/opencode-context.nvim ~/.config/nvim/pack/plugins/start/opencode-context.nvim
+<
+
+2. Add to your `init.lua`: >
+
+    require("opencode-context").setup({
+      tmux_target = nil,
+      auto_detect_pane = true,
+      ui = {
+        window_type = "float",
+        float = {
+          width = 0.9,
+          height = 1,
+          border = "solid",
+          position = "bottom",
+          margin = 2,
+        },
+      },
+    })
+<
+
+==============================================================================
+USAGE                                                      *opencode-context-usage*
+
+1. In tmux, split your window: `Ctrl-b %` or `Ctrl-b "`
+2. Start OpenCode in one pane: `opencode`
+3. Open Neovim in the other pane: `nvim`
+4. From Neovim, press `<leader>oc` to open the prompt input
+5. Enter your prompt with placeholders: `"Fix this error: @diagnostics"`
+6. See your prompt and response directly in the OpenCode pane!
+
+==============================================================================
+CONFIGURATION                                        *opencode-context-config*
+
+Call `require('opencode-context').setup({})` with your configuration options.
+
+------------------------------------------------------------------------------
+TMUX SETTINGS                                       *opencode-context-config-tmux*
+
+tmux_target                          string (default: nil)
+    Manual override for tmux target pane in format "session:window.pane"
+
+auto_detect_pane                     boolean (default: true)
+    Auto-detect OpenCode pane in current window
+
+------------------------------------------------------------------------------
+UI SETTINGS                                         *opencode-context-config-ui*
+
+ui.window_type                       string (default: "float")
+    Window type: "float" or "split"
+
+ui.float.width                       number (default: 0.9)
+    Percentage of editor width (0.0-1.0)
+
+ui.float.height                      number (default: 1)
+    Number of lines for floating window
+
+ui.float.border                      string (default: "solid")
+    Border style: "none", "single", "double", "rounded", "solid", "shadow"
+
+ui.float.position                    string (default: "bottom")
+    Window position: "top", "bottom", "center"
+
+ui.float.margin                      number (default: 2)
+    Margin from screen edges
+
+ui.split.position                    string (default: "bottom")
+    Split position: "top", "bottom", "left", "right"
+
+ui.split.size                        number (default: 8)
+    Number of lines/columns for split window
+
+==============================================================================
+COMMANDS                                                *opencode-context-commands*
+
+:OpencodeSend                                           *:OpencodeSend*
+    Open prompt input for OpenCode with placeholder support
+
+:OpencodeSwitchMode                                     *:OpencodeSwitchMode*
+    Toggle OpenCode between planning and build mode
+
+:OpencodePrompt                                         *:OpencodePrompt*
+    Open OpenCode persistent prompt window
+
+==============================================================================
+KEYMAPS                                                 *opencode-context-keymaps*
+
+The plugin provides default keymaps when loaded. You can customize them in
+your configuration.
+
+Normal mode:
+<leader>oc                           Send prompt to OpenCode
+<leader>ot                           Toggle OpenCode mode
+<leader>op                           Open persistent prompt
+
+Visual mode:
+<leader>oc                           Send prompt to OpenCode (with @selection)
+
+==============================================================================
+PLACEHOLDERS                                          *opencode-context-placeholders*
+
+Use these placeholders in your prompts to include context:
+
+@file                               Current file path (relative)
+@buffers                            All buffer file paths (relative)
+@cursor                             Cursor position info (file, line, column)
+@here                               Alias to @cursor
+@selection                          Current visual selection content
+@range                              Current visual selection range
+@diagnostics                        LSP diagnostics for current line
+
+==============================================================================
+EXAMPLES                                                *opencode-context-examples*
+
+Basic usage: >
+    "Fix this error: @diagnostics"
+    "Explain this code: @selection"
+    "What does @file do?"
+    "Add tests for @file"
+    "Review these buffers: @buffers"
+    "How do these files work together: @buffers"
+    "Help me at @cursor in @file"
+<
+
+Workflow example:
+1. Select some code in visual mode
+2. Press `<leader>oc`
+3. Type: `"Explain this code: @selection"`
+4. Press Enter to send to OpenCode
+
+==============================================================================
+TROUBLESHOOTING                                    *opencode-context-troubleshooting*
+
+"No opencode pane found in current window"              *opencode-context-no-pane*
+
+- Ensure OpenCode is running in a pane in the same tmux window as Neovim
+- Use `Ctrl-b %` or `Ctrl-b "` to split and run OpenCode in one pane
+- Set `tmux_target = "session:window.pane"` to override detection
+- Verify OpenCode is actually running in the current window
+
+"Failed to send to opencode pane"                       *opencode-context-send-failed*
+
+- Check tmux pane permissions
+- Verify the tmux target pane exists
+- Ensure you're in the same tmux session
+
+Debug commands: ~
+
+Check if OpenCode pane is detected: >
+    tmux list-panes -F '#{session_name}:#{window_index}.#{pane_index}' -f '#{==:#{pane_current_command},opencode}'
+<
+
+Test manual tmux send: >
+    tmux send-keys -t session:window.pane "test message" Enter
+<
+
+List all panes in current window: >
+    tmux list-panes -F '#{session_name}:#{window_index}.#{pane_index} #{pane_current_command}'
+<
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
