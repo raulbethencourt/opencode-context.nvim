@@ -177,6 +177,7 @@ EOF
 
 - `<leader>oc` - Open prompt input (works in normal and visual mode)
 - `<leader>ot` - Toggle opencode mode (planning ↔ build)
+- `<leader>op` - Toggle persistent prompt window
 
 ### Placeholders
 
