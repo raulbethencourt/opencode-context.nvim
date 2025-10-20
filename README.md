@@ -31,12 +31,12 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
     tmux_target = nil,  -- Manual override: "session:window.pane"
     auto_detect_pane = true,  -- Auto-detect opencode pane in current window
   },
-  keys = {
-    { "<leader>oc", "<cmd>OpencodeSend<cr>", desc = "Send prompt to opencode" },
-    { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = "v", desc = "Send prompt to opencode" },
-    { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
-    { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
-  },
+   keys = {
+     { "<leader>oc", "<cmd>OpencodeSend<cr>", desc = "Send prompt to opencode" },
+     { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = "v", desc = "Send prompt to opencode" },
+     { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
+     { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
+   },
   cmd = { "OpencodeSend", "OpencodeSwitchMode" },
 }
 ```
@@ -176,7 +176,7 @@ EOF
 ### Default Keymaps
 
 - `<leader>oc` - Open prompt input (works in normal and visual mode)
-- `<leader>om` - Toggle opencode mode (planning ↔ build)
+- `<leader>ot` - Toggle opencode mode (planning ↔ build)
 
 ### Placeholders
 
