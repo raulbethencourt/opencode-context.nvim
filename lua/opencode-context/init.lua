@@ -210,21 +210,21 @@ local function find_opencode_pane()
 		return nil
 	end
 
-	-- Get current session and window
-	local current_session_cmd = "tmux display-message -p '#{session_name}'"
-	local current_window_cmd = "tmux display-message -p '#{window_index}'"
+  -- Get current session and window
+  local current_session_cmd = "tmux display-message -p '#{session_name}'"
+  local current_window_cmd = "tmux display-message -p '#{window_index}'"
 
-	local session_handle = io.popen(current_session_cmd .. " 2>/dev/null")
-	local window_handle = io.popen(current_window_cmd .. " 2>/dev/null")
+  local session_ok, session_handle = pcall(io.popen, current_session_cmd .. " 2>/dev/null")
+  local window_ok, window_handle = pcall(io.popen, current_window_cmd .. " 2>/dev/null")
 
-	if not session_handle or not window_handle then
-		return nil
-	end
+  if not session_ok or not window_ok or not session_handle or not window_handle then
+    return nil
+  end
 
-	local current_session = session_handle:read("*a"):gsub("\n", "")
-	local current_window = window_handle:read("*a"):gsub("\n", "")
-	session_handle:close()
-	window_handle:close()
+  local current_session = session_handle:read("*a"):gsub("\n", "")
+  local current_window = window_handle:read("*a"):gsub("\n", "")
+  session_handle:close()
+  window_handle:close()
 
 	if not current_session or current_session == "" or not current_window or current_window == "" then
 		return nil
@@ -254,16 +254,16 @@ local function find_opencode_pane()
 		),
 	}
 
-	for _, cmd in ipairs(strategies) do
-		local handle = io.popen(cmd .. " 2>/dev/null")
-		if handle then
-			local result = handle:read("*a"):gsub("\n", "")
-			handle:close()
-			if result and result ~= "" then
-				return result
-			end
-		end
-	end
+  for _, cmd in ipairs(strategies) do
+    local ok, handle = pcall(io.popen, cmd .. " 2>/dev/null")
+    if ok and handle then
+      local result = handle:read("*a"):gsub("\n", "")
+      handle:close()
+      if result and result ~= "" then
+        return result
+      end
+    end
+  end
 
 	return nil
 end
@@ -292,12 +292,12 @@ local function send_to_opencode(message)
 end
 
 function M.send_prompt()
-	-- Check if we're in visual mode and pre-populate with @selection
-	local mode = vim.fn.mode()
-	local default_text = ""
-	if mode == "v" or mode == "V" or mode == "\22" then -- \22 is visual block mode
-		default_text = "@selection "
-	end
+  -- Check if we're in visual mode and pre-populate with @selection
+  local mode = vim.api.nvim_get_mode().mode
+  local default_text = ""
+  if mode == "v" or mode == "V" or mode == "\22" then -- \22 is visual block mode
+    default_text = "@selection "
+  end
 
 	vim.ui.input({
 		prompt = "Enter prompt for opencode (use @file, @buffers, @cursor, @selection, @diagnostics): ",
