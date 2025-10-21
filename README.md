@@ -75,45 +75,6 @@ vim.keymap.set("n", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open open
 EOF
 ```
 
-### lazy.nvim with UI Configuration
-
-For advanced UI customization with lazy.nvim:
-
-```lua
-{
-  "cousine/opencode-context.nvim",
-  opts = {
-    -- Tmux settings
-    tmux_target = nil,
-    auto_detect_pane = true,
-
-    -- UI settings (place ui inside opts, not at top level)
-    ui = {
-      window_type = "float",  -- "float" or "split"
-      float = {
-        width = 0.6,          -- 60% of editor width
-        height = 1,           -- 1 line height
-        border = "rounded",   -- Rounded border style
-        position = "center",  -- Center the window
-        margin = 2,           -- 2 line margin
-      },
-      split = {
-        position = "bottom",  -- "top", "bottom", "left", "right"
-        size = 8,             -- Split size
-      },
-    },
-  },
-  keys = {
-    { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
-    { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
-    { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
-  },
-  cmd = { "OpencodeSend", "OpencodeSwitchMode", "OpencodePrompt" },
-}
-```
-
-**Important**: The `ui` configuration must be placed inside the `opts` table, not at the top level of the lazy config.
-
 ### dein.vim
 
 ```vim
