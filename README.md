@@ -85,16 +85,17 @@ lua << EOF
 require('opencode-context').setup({
   tmux_target = nil,
   auto_detect_pane = true,
-  ui = {
-    window_type = "float",
-    float = {
-      width = 0.9,
-      height = 1,
-      border = "solid",
-      position = "bottom",
-      margin = 2,
-    },
-  },
+   ui = {
+     window_type = "float",
+     float = {
+       width = 0.9,
+       height = 1,
+       border = "solid",
+       position = "bottom",
+       margin = 2,
+       title_pos = "left",
+     },
+   },
 })
 EOF
 ```
@@ -113,16 +114,17 @@ EOF
     require("opencode-context").setup({
       tmux_target = nil,
       auto_detect_pane = true,
-      ui = {
-        window_type = "float",
-        float = {
-          width = 0.9,
-          height = 1,
-          border = "solid",
-          position = "bottom",
-          margin = 2,
-        },
-      },
+       ui = {
+         window_type = "float",
+         float = {
+           width = 0.9,
+           height = 1,
+           border = "solid",
+           position = "bottom",
+           margin = 2,
+           title_pos = "left",
+         },
+       },
     })
     ```
 
@@ -208,6 +210,7 @@ The `ui` configuration allows you to customize the appearance and behavior of th
   - `border`: Border style (`"none"`, `"single"`, `"double"`, `"rounded"`, `"solid"`, `"shadow"`)
   - `position`: Window position (`"top"`, `"bottom"`, `"center"`)
   - `margin`: Margin from screen edges (default: 2)
+  - `title_pos`: Title position (`"left"`, `"center"`, `"right"`, default: `"left"`)
 - **Split window options**:
   - `position`: Split position (`"top"`, `"bottom"`, `"left"`, `"right"`)
   - `size`: Number of lines/columns (default: 8)

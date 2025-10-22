@@ -14,6 +14,7 @@ M.defaults = {
 			border = "solid", -- Border style: "none", "single", "double", "rounded", "solid", "shadow"
 			position = "bottom", -- "top", "bottom", "center"
 			margin = 2, -- Margin from edges
+		    title_pos = "left", -- Prompt window title position
 		},
 		split = {
 			position = "bottom", -- "top", "bottom", "left", "right"

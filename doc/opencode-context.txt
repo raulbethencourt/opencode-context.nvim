@@ -71,6 +71,7 @@ For advanced UI customization: >
             border = "rounded",   -- Rounded border style
             position = "center",  -- Center the window
             margin = 2,           -- 2 line margin
+            title_pos = "left",   -- Window title position to left
           },
           split = {
             position = "bottom",  -- "top", "bottom", "left", "right"
@@ -172,6 +173,7 @@ MANUAL INSTALLATION                               *opencode-context-manual*
           border = "solid",
           position = "bottom",
           margin = 2,
+          title_pos = "left",
         },
       },
     })
@@ -221,6 +223,9 @@ ui.float.position                    string (default: "bottom")
 
 ui.float.margin                      number (default: 2)
     Margin from screen edges
+
+ui.float.title_pos                   string (default: "left")
+    Title position: "left", "center", "right"
 
 ui.split.position                    string (default: "bottom")
     Split position: "top", "bottom", "left", "right"

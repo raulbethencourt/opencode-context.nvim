@@ -131,8 +131,8 @@ local function create_float_window(bufnr, send_callback)
 		col = col,
 		style = "minimal",
 		border = cfg.border or "solid",
-		title = " OpenCode - use @file, @buffers, @cursor, @selection, @diagnostics, @here",
-		title_pos = "left",
+		title = " OpenCode",
+		title_pos = cfg.title_pos or "left",
 	})
 
 	-- Set window options

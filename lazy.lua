@@ -15,6 +15,7 @@ return {
         border = "solid",
         position = "bottom",
         margin = 2,
+		title_pos = "left",
       },
       -- split = { ... }  -- Only needed if using split windows
     },
