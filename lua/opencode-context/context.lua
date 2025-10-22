@@ -1,11 +1,17 @@
 local M = {}
 
-local function get_current_file_path()
-	local function is_floating(winid)
-		local config = vim.api.nvim_win_get_config(winid)
-		return config.relative ~= ""
-	end
+--- Check if a window is floating (has relative positioning)
+--- @param winid number: Window ID to check
+--- @return boolean: true if window is floating, false otherwise
+local function is_floating(winid)
+	local config = vim.api.nvim_win_get_config(winid)
+	return config.relative ~= ""
+end
 
+--- Get the current file path relative to the working directory
+--- Handles floating windows by falling back to the previous window
+--- @return string: Relative path of the current file
+local function get_current_file_path()
 	local current_win = vim.api.nvim_get_current_win()
 	local target_win = current_win
 
@@ -26,6 +32,8 @@ local function get_current_file_path()
 	return relative_path
 end
 
+--- Get paths of all listed buffers as a comma-separated string
+--- @return string: Comma-separated list of buffer file paths, or "No buffers" if none found
 local function get_buffers_paths()
 	local buffers = vim.api.nvim_list_bufs()
 	local file_paths = {}
@@ -50,13 +58,12 @@ local function get_buffers_paths()
 	return table.concat(file_paths, ", ")
 end
 
--- returns the buffer, relative file path and cursor
+--- Get cursor position information including buffer number, file path, and cursor coordinates
+--- Handles floating windows by falling back to the previous window
+--- @return number: Buffer number
+--- @return string: Relative file path
+--- @return table: Cursor position as {line, column}
 local function get_cursor()
-	local function is_floating(winid)
-		local config = vim.api.nvim_win_get_config(winid)
-		return config.relative ~= ""
-	end
-
 	local current_win = vim.api.nvim_get_current_win()
 	local target_win = current_win
 
@@ -76,6 +83,8 @@ local function get_cursor()
 	return bufnr, relative_path, cursor
 end
 
+--- Get formatted cursor information as a human-readable string
+--- @return string: Formatted string with file path, line number, and column number
 local function get_cursor_info()
 	local _, relative_path, cursor = get_cursor()
 	local line_num = cursor[1]
@@ -84,12 +93,14 @@ local function get_cursor_info()
 	return string.format("%s, Line: %d, Column: %d", relative_path, line_num, col_num)
 end
 
+--- Get visual selection details including file path, line range, and selected text
+--- Works with current visual selection or last visual selection marks
+--- Handles floating windows by falling back to the previous window
+--- @return string: Relative file path
+--- @return number: Start line (0-based)
+--- @return number: End line (0-based)
+--- @return string: Selected text content
 local function get_visual_selection()
-	local function is_floating(winid)
-		local config = vim.api.nvim_win_get_config(winid)
-		return config.relative ~= ""
-	end
-
 	local current_win = vim.api.nvim_get_current_win()
 	local target_win = current_win
 
@@ -144,20 +155,24 @@ local function get_visual_selection()
 	return relative_path, start_line, end_line, selection
 end
 
--- returns the file, range and contents of the visual selection
+--- Get formatted visual selection with file path, line range, and content
+--- @return string: Formatted string with file path, line range, and selected content
 local function get_selection()
 	local relative_path, start_line, end_line, selection = get_visual_selection()
 
 	return string.format("%s (lines %d-%d) - `%s`", relative_path, start_line + 1, end_line, selection)
 end
 
--- returns the file and range of the visual selection
+--- Get visual selection range without the actual content
+--- @return string: Formatted string with file path and line range only
 local function get_visual_range()
 	local relative_path, start_line, end_line, _ = get_visual_selection()
 
 	return string.format("%s (lines %d-%d)", relative_path, start_line + 1, end_line)
 end
 
+--- Get LSP diagnostics for the current cursor line
+--- @return string: Formatted diagnostics string with file context, or empty string if no diagnostics
 local function get_diagnostics()
 	local bufnr, relative_path, cursor = get_cursor()
 	local current_line = cursor[1] - 1 -- Convert to 0-based indexing

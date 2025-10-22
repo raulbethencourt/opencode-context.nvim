@@ -5,7 +5,11 @@ local prompt_win = nil
 local prompt_buf = nil
 local config_module = require("opencode-context.config")
 
--- Placeholder completion function
+--- Placeholder completion function for omnifunc
+--- Provides completion for @placeholders when typing in the prompt
+--- @param findstart number: 1 to find start position, 0 to return completion items
+--- @param base string: The text to complete (when findstart is 0)
+--- @return number|table: Start position when findstart=1, completion items when findstart=0
 local function placeholder_complete(findstart, base)
 	if findstart == 1 then
 		-- Find the start of the word after '@'
@@ -16,9 +20,9 @@ local function placeholder_complete(findstart, base)
 			start = start - 1
 		end
 		if start > 0 and line:sub(start, start) == "@" then
-			return start + 1  -- start after @
+			return start + 1 -- start after @
 		end
-		return -1  -- no completion if no @
+		return -1 -- no completion if no @
 	else
 		-- Return completion items
 		local items = {}
@@ -40,11 +44,16 @@ local function placeholder_complete(findstart, base)
 	end
 end
 
+--- Get the current plugin configuration
+--- Always fetches fresh config to handle setup() being called after initial load
+--- @return table<string, any>: Current configuration table
 local function get_config()
 	-- Always get fresh config to handle setup() being called after initial load
 	return config_module.get()
 end
 
+--- Create or reuse the prompt buffer with proper settings
+--- @return number: Buffer number for the prompt buffer
 local function create_prompt_buffer()
 	if prompt_buf and vim.api.nvim_buf_is_valid(prompt_buf) then
 		return prompt_buf
@@ -61,6 +70,11 @@ local function create_prompt_buffer()
 	return prompt_buf
 end
 
+--- Setup keymaps for the prompt buffer
+--- Configures completion, sending, and navigation keybindings
+--- @param bufnr number: Buffer number to set keymaps on
+--- @param send_callback function: Callback function to send prompts
+--- @return nil
 local function setup_prompt_keymaps(bufnr, send_callback)
 	local opts = { buffer = bufnr, silent = true }
 
@@ -106,6 +120,11 @@ local function setup_prompt_keymaps(bufnr, send_callback)
 	end, opts)
 end
 
+--- Create a floating window for the prompt buffer
+--- Positions the window based on configuration settings
+--- @param bufnr number: Buffer number to display in the window
+--- @param send_callback function: Callback function for sending prompts
+--- @return nil
 local function create_float_window(bufnr, send_callback)
 	local cfg = get_config().ui.float
 	local width = math.floor(vim.o.columns * (cfg.width or 0.9))
@@ -131,7 +150,7 @@ local function create_float_window(bufnr, send_callback)
 		col = col,
 		style = "minimal",
 		border = cfg.border or "solid",
-		title = " OpenCode",
+		title = " OpenCode",
 		title_pos = cfg.title_pos or "left",
 	})
 
@@ -140,6 +159,11 @@ local function create_float_window(bufnr, send_callback)
 	vim.wo[prompt_win].linebreak = true
 end
 
+--- Create a split window for the prompt buffer
+--- Creates a horizontal or vertical split based on configuration
+--- @param bufnr number: Buffer number to display in the window
+--- @param send_callback function: Callback function for sending prompts
+--- @return nil
 local function create_split_window(bufnr, send_callback)
 	local cfg = get_config().ui.split
 	local position = cfg.position or "bottom"
@@ -165,6 +189,10 @@ local function create_split_window(bufnr, send_callback)
 	vim.api.nvim_set_current_win(current_win)
 end
 
+--- Show the persistent prompt window
+--- Creates a floating or split window based on configuration and sets up keymaps
+--- @param send_callback function: Callback function to handle prompt submission
+--- @return nil
 function M.show_persistent_prompt(send_callback)
 	if prompt_win and vim.api.nvim_win_is_valid(prompt_win) then
 		vim.api.nvim_set_current_win(prompt_win)
@@ -206,6 +234,9 @@ function M.show_persistent_prompt(send_callback)
 	end
 end
 
+--- Hide the persistent prompt window
+--- Closes the window appropriately based on window type (float vs split)
+--- @return nil
 function M.hide_persistent_prompt()
 	if prompt_win and vim.api.nvim_win_is_valid(prompt_win) then
 		local cfg = get_config()
@@ -220,6 +251,10 @@ function M.hide_persistent_prompt()
 	end
 end
 
+--- Toggle the persistent prompt window visibility
+--- Shows the prompt if hidden, hides if visible
+--- @param send_callback function: Callback function to handle prompt submission
+--- @return nil
 function M.toggle_persistent_prompt(send_callback)
 	if prompt_win and vim.api.nvim_win_is_valid(prompt_win) then
 		M.hide_persistent_prompt()
@@ -228,6 +263,8 @@ function M.toggle_persistent_prompt(send_callback)
 	end
 end
 
+--- Check if the prompt window is currently visible
+--- @return boolean: true if prompt window exists and is valid, false otherwise
 function M.is_prompt_visible()
 	return prompt_win and vim.api.nvim_win_is_valid(prompt_win)
 end

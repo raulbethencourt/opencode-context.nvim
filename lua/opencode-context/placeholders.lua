@@ -1,6 +1,10 @@
 local M = {}
 local context = require("opencode-context.context")
 
+--- Replace placeholder tokens in a prompt with actual context values
+--- Supports placeholders: @buffers, @file, @selection, @range, @diagnostics, @here, @cursor
+--- @param prompt string: The prompt text containing placeholders to replace
+--- @return string: The prompt with all placeholders replaced with their corresponding values
 local function replace_placeholders(prompt)
 	local replacements = {
 		["@buffers"] = context.get_buffers_paths, -- Process @buffers FIRST

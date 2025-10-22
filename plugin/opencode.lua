@@ -1,3 +1,8 @@
+-- OpenCode Context Neovim Plugin
+-- Provides integration between Neovim and opencode via tmux
+-- Author: opencode-context.nvim contributors
+
+-- Prevent double loading of plugin
 if vim.g.loaded_opencode then
 	return
 end
@@ -12,24 +17,33 @@ vim.cmd("silent! helptags " .. plugin_dir .. "/doc")
 
 local opencode = require("opencode-context")
 
+--- Create user command to send prompts to opencode with placeholder support
+--- Usage: :OpencodeSend
 vim.api.nvim_create_user_command("OpencodeSend", function()
 	opencode.send_prompt()
 end, {
 	desc = "Send prompt to opencode with placeholder support",
 })
 
+--- Create user command to toggle opencode between planning and build mode
+--- Usage: :OpencodeSwitchMode
 vim.api.nvim_create_user_command("OpencodeSwitchMode", function()
 	opencode.toggle_mode()
 end, {
 	desc = "Toggle opencode between planning and build mode",
 })
 
+--- Create user command to toggle the persistent opencode prompt window
+--- Usage: :OpencodePrompt
 vim.api.nvim_create_user_command("OpencodePrompt", function()
 	opencode.toggle_persistent_prompt()
 end, {
 	desc = "Toggle persistent opencode prompt window",
 })
 
+--- Create default keymaps for opencode functionality
+--- Sets up <leader>oc, <leader>ot, and <leader>op keymaps
+--- @return nil
 local function create_keymaps()
 	vim.keymap.set("n", "<leader>oc", opencode.send_prompt, { desc = "Send prompt to opencode" })
 	vim.keymap.set("v", "<leader>oc", opencode.send_prompt, { desc = "Send prompt to opencode" })
@@ -37,6 +51,7 @@ local function create_keymaps()
 	vim.keymap.set("n", "<leader>op", opencode.toggle_persistent_prompt, { desc = "Toggle persistent opencode prompt" })
 end
 
+--- Setup keymaps after Vim has fully started to avoid conflicts
 vim.api.nvim_create_autocmd("VimEnter", {
 	callback = create_keymaps,
 	once = true,
