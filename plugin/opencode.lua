@@ -4,11 +4,11 @@ end
 vim.g.loaded_opencode = 1
 
 -- Add doc directory to runtimepath for help
-local plugin_dir = vim.fn.fnamemodify(vim.fn.expand('<sfile>:p:h:h'), ':p')
-vim.opt.runtimepath:append(plugin_dir .. '/doc')
+local plugin_dir = vim.fn.fnamemodify(vim.fn.expand("<sfile>:p:h:h"), ":p")
+vim.opt.runtimepath:append(plugin_dir .. "/doc")
 
 -- Generate helptags
-vim.cmd('silent! helptags ' .. plugin_dir .. '/doc')
+vim.cmd("silent! helptags " .. plugin_dir .. "/doc")
 
 local opencode = require("opencode-context")
 
@@ -41,4 +41,3 @@ vim.api.nvim_create_autocmd("VimEnter", {
 	callback = create_keymaps,
 	once = true,
 })
-

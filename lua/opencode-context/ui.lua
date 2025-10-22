@@ -3,12 +3,46 @@ local M = {}
 -- UI state
 local prompt_win = nil
 local prompt_buf = nil
-local config = nil
+local config_module = require("opencode-context.config")
+
+-- Placeholder completion function
+local function placeholder_complete(findstart, base)
+	if findstart == 1 then
+		-- Find the start of the word after '@'
+		local line = vim.api.nvim_get_current_line()
+		local col = vim.api.nvim_win_get_cursor(0)[2]
+		local start = col
+		while start > 0 and line:sub(start, start) ~= "@" do
+			start = start - 1
+		end
+		if start > 0 and line:sub(start, start) == "@" then
+			return start + 1  -- start after @
+		end
+		return -1  -- no completion if no @
+	else
+		-- Return completion items
+		local items = {}
+		local placeholders = {
+			{ word = "buffers", abbr = "@buffers", menu = "All buffer file paths" },
+			{ word = "file", abbr = "@file", menu = "Current file path" },
+			{ word = "selection", abbr = "@selection", menu = "Visual selection content" },
+			{ word = "range", abbr = "@range", menu = "Visual selection range" },
+			{ word = "diagnostics", abbr = "@diagnostics", menu = "LSP diagnostics" },
+			{ word = "here", abbr = "@here", menu = "Cursor position info" },
+			{ word = "cursor", abbr = "@cursor", menu = "Cursor position info" },
+		}
+		for _, ph in ipairs(placeholders) do
+			if base == "" or ph.word:find(base, 1, true) then
+				table.insert(items, ph)
+			end
+		end
+		return items
+	end
+end
 
 local function get_config()
 	-- Always get fresh config to handle setup() being called after initial load
-	config = require("opencode-context").config
-	return config
+	return config_module.get()
 end
 
 local function create_prompt_buffer()
@@ -30,6 +64,14 @@ end
 local function setup_prompt_keymaps(bufnr, send_callback)
 	local opts = { buffer = bufnr, silent = true }
 
+	-- Set up completion
+	vim.bo[bufnr].omnifunc = "v:lua.require'opencode-context.ui'.placeholder_complete"
+
+	-- Auto-trigger completion when typing "@"
+	vim.keymap.set("i", "@", function()
+		return "@<C-x><C-o>"
+	end, { buffer = bufnr, expr = true })
+
 	-- Enter to send prompt
 	vim.keymap.set("i", "<CR>", function()
 		local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
@@ -49,6 +91,9 @@ local function setup_prompt_keymaps(bufnr, send_callback)
 			end
 		end
 	end, opts)
+
+	-- Ctrl-Space to trigger completion
+	vim.keymap.set("i", "<C-c>", "<C-x><C-o>", opts)
 
 	-- Escape to return to normal mode
 	vim.keymap.set("i", "<Esc>", function()
@@ -186,5 +231,8 @@ end
 function M.is_prompt_visible()
 	return prompt_win and vim.api.nvim_win_is_valid(prompt_win)
 end
+
+-- Expose completion function for omnifunc
+M.placeholder_complete = placeholder_complete
 
 return M
