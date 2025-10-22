@@ -6,6 +6,8 @@ M.defaults = {
 	-- Tmux settings
 	tmux_target = nil, -- Manual override: "session:window.pane"
 	auto_detect_pane = true, -- Auto-detect opencode pane in current window
+	auto_create_pane = true, -- Auto-create opencode pane if not found
+	split_direction = "vertical", -- "horizontal" or "vertical" for new pane
 
 	-- UI settings
 	ui = {

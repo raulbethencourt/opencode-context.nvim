@@ -1,17 +1,44 @@
 local M = {}
 local config = require("opencode-context.config")
 
+--- Create a new opencode pane in the specified session and window
+--- @param session string: Tmux session name
+--- @param window string: Tmux window index
+--- @return string|nil: Tmux pane target identifier or nil if creation failed
+local function create_opencode_pane(session, window)
+	local direction = config.get().split_direction == "vertical" and "-h" or "-v"
+	local cmd = string.format("tmux split-window -P -F '#{pane_index}' %s 'opencode'", direction)
+
+	local ok, handle = pcall(io.popen, cmd .. " 2>/dev/null")
+	if not ok or not handle then
+		return nil
+	end
+
+	local pane_index = handle:read("*a"):gsub("\n", "")
+	handle:close()
+
+	if pane_index and pane_index ~= "" and vim.v.shell_error == 0 then
+		local target = string.format("%s:%s.%s", session, window, pane_index)
+		vim.notify(string.format("Created new opencode pane (%s)", target), vim.log.levels.INFO)
+		return target
+	else
+		vim.notify("Failed to create opencode pane", vim.log.levels.ERROR)
+		return nil
+	end
+end
+
 --- Find the opencode pane in the current tmux session and window
 --- Uses multiple strategies to detect the pane: current command, pane title, and command history
---- @return string|nil: Tmux pane target identifier (e.g., "session:window.pane") or nil if not found
+--- If not found and auto_create_pane is enabled, creates a new pane with opencode
+--- @return string|nil, boolean: Tmux pane target identifier (e.g., "session:window.pane") or nil if not found or creation failed, and whether it was created
 local function find_opencode_pane()
 	-- If manual target is set, use it
 	if config.get().tmux_target then
-		return config.get().tmux_target
+		return config.get().tmux_target, false
 	end
 
 	if not config.get().auto_detect_pane then
-		return nil
+		return nil, false
 	end
 
 	-- Get current session and window
@@ -22,7 +49,7 @@ local function find_opencode_pane()
 	local window_ok, window_handle = pcall(io.popen, current_window_cmd .. " 2>/dev/null")
 
 	if not session_ok or not window_ok or not session_handle or not window_handle then
-		return nil
+		return nil, false
 	end
 
 	local current_session = session_handle:read("*a"):gsub("\n", "")
@@ -31,7 +58,7 @@ local function find_opencode_pane()
 	window_handle:close()
 
 	if not current_session or current_session == "" or not current_window or current_window == "" then
-		return nil
+		return nil, false
 	end
 
 	-- Search for opencode pane in current window only
@@ -58,18 +85,28 @@ local function find_opencode_pane()
 		),
 	}
 
+	local pane = nil
+	local was_created = false
 	for _, cmd in ipairs(strategies) do
 		local ok, handle = pcall(io.popen, cmd .. " 2>/dev/null")
 		if ok and handle then
 			local result = handle:read("*a"):gsub("\n", "")
 			handle:close()
 			if result and result ~= "" then
-				return result
+				pane = result
+				break
 			end
 		end
 	end
 
-	return nil
+	if not pane and config.get().auto_create_pane then
+		pane = create_opencode_pane(current_session, current_window)
+		if pane then
+			was_created = true
+		end
+	end
+
+	return pane, was_created
 end
 
 --- Send a message to the opencode pane
@@ -77,13 +114,18 @@ end
 --- @param message string: The message to send to the opencode pane
 --- @return boolean: true if message was sent successfully, false otherwise
 local function send_to_opencode(message)
-	local pane = find_opencode_pane()
+	local pane, was_created = find_opencode_pane()
 	if not pane then
 		vim.notify(
 			"No opencode pane found in current window. Make sure opencode is running in a pane in this tmux window.",
 			vim.log.levels.ERROR
 		)
 		return false
+	end
+
+	-- Wait for opencode to start if pane was just created
+	if was_created then
+		vim.fn.system("sleep 2")
 	end
 
 	-- Send message directly to the pane
