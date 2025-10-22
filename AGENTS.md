@@ -31,6 +31,26 @@ This is a Neovim Lua plugin - no build system required. Test by loading in Neovi
 ### Naming Conventions
 
 - Functions: snake_case (`send_current_buffer`)
+- Typing: use types in functions
+  Exemple :
+
+```lua
+---Creates alias for keymaps
+---@param mode string|string[]
+---@param keys string
+---@param func string|function
+---@param desc? string?
+---@return nil
+---
+M.keymap = function(mode, keys, func, desc)
+    if not desc or string.len(desc) == 0 then
+        desc = 'keymap'
+    end
+
+    vim.keymap.set(mode, keys, func, { noremap = true, silent = true, desc = desc })
+end
+```
+
 - Config keys: snake_case (`auto_detect_pane`)
 - Commands: PascalCase with plugin prefix (`OpencodeSend`)
 - Variables: snake_case, descriptive names
