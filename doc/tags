@@ -1,5 +1,7 @@
+:OpencodePane	opencode-context.txt	/*:OpencodePane*
 :OpencodePrompt	opencode-context.txt	/*:OpencodePrompt*
 :OpencodeSend	opencode-context.txt	/*:OpencodeSend*
+:OpencodeSessions	opencode-context.txt	/*:OpencodeSessions*
 :OpencodeSwitchMode	opencode-context.txt	/*:OpencodeSwitchMode*
 opencode-context	opencode-context.txt	/*opencode-context*
 opencode-context-commands	opencode-context.txt	/*opencode-context-commands*
@@ -17,6 +19,7 @@ opencode-context-no-pane	opencode-context.txt	/*opencode-context-no-pane*
 opencode-context-packer	opencode-context.txt	/*opencode-context-packer*
 opencode-context-placeholders	opencode-context.txt	/*opencode-context-placeholders*
 opencode-context-send-failed	opencode-context.txt	/*opencode-context-send-failed*
+opencode-context-sessions	opencode-context.txt	/*opencode-context-sessions*
 opencode-context-troubleshooting	opencode-context.txt	/*opencode-context-troubleshooting*
 opencode-context-usage	opencode-context.txt	/*opencode-context-usage*
 opencode-context-vimplug	opencode-context.txt	/*opencode-context-vimplug*

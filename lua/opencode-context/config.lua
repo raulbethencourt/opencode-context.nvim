@@ -9,6 +9,10 @@ M.defaults = {
 	auto_create_pane = true, -- Auto-create opencode pane if not found
 	split_direction = "vertical", -- "horizontal" or "vertical" for new pane
 
+	-- Server settings
+	server_hostname = "127.0.0.1", -- Opencode server hostname
+	server_port = 4096, -- Opencode server port
+
 	-- UI settings
 	ui = {
 		window_type = "float", -- "float" or "split"

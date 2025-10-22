@@ -3,21 +3,22 @@
 ==============================================================================
 CONTENTS                                                    *opencode-context*
 
-    1. Introduction ........................... |opencode-context-intro|
-    2. Installation ........................... |opencode-context-install|
-    3. Usage .................................. |opencode-context-usage|
-    4. Configuration ......................... |opencode-context-config|
-    5. Commands .............................. |opencode-context-commands|
-    6. Keymaps ............................... |opencode-context-keymaps|
-    7. Placeholders .......................... |opencode-context-placeholders|
-    8. Examples .............................. |opencode-context-examples|
-    9. Troubleshooting ....................... |opencode-context-troubleshooting|
+      1. Introduction ........................... |opencode-context-intro|
+      2. Installation ........................... |opencode-context-install|
+      3. Usage .................................. |opencode-context-usage|
+      4. Configuration ......................... |opencode-context-config|
+      5. Commands .............................. |opencode-context-commands|
+      6. Keymaps ............................... |opencode-context-keymaps|
+      7. Placeholders .......................... |opencode-context-placeholders|
+      8. Session Management .................... |opencode-context-sessions|
+      9. Examples .............................. |opencode-context-examples|
+     10. Troubleshooting ....................... |opencode-context-troubleshooting|
 
 ==============================================================================
 INTRODUCTION                                            *opencode-context-intro*
 
 opencode-context.nvim is a Neovim plugin that enables seamless context sharing
-with running OpenCode sessions inside Tmux. Send your current buffer, all open
+with running OpenCode instances inside Tmux. Send your current buffer, all open
 buffers, visual selections, or diagnostics directly to OpenCode running in a
 Tmux pane for AI-assisted development.
 
@@ -25,15 +26,18 @@ Features:
 - Interactive prompt input for OpenCode
 - Smart placeholder replacement system
 - Tmux integration for direct pane communication
+- Auto-creation of OpenCode panes
 - Configurable UI (floating or split windows)
+- Session management and selection from OpenCode server
 
 ==============================================================================
 INSTALLATION                                          *opencode-context-install*
 
 Requirements:
 - Neovim >= 0.8.0
-- Tmux (required for sending messages to running OpenCode sessions)
+- Tmux (required for sending messages to running OpenCode instances)
 - OpenCode running in a pane within the same tmux window as Neovim
+- OpenCode server (for session management, optional)
 
 ------------------------------------------------------------------------------
 LAZY.NVIM                                               *opencode-context-lazy*
@@ -41,18 +45,21 @@ LAZY.NVIM                                               *opencode-context-lazy*
 For basic usage: >
     {
       "cousine/opencode-context.nvim",
-      opts = {
-        tmux_target = nil,
-        auto_detect_pane = true,
-      },
-      keys = {
-        { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
-        { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
-        { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
-      },
-      cmd = { "OpencodeSend", "OpencodeSwitchMode", "OpencodePrompt" },
-    }
-<
+       opts = {
+         tmux_target = nil,
+         auto_detect_pane = true,
+         auto_create_pane = true,
+         split_direction = "vertical",
+       },
+        keys = {
+          { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
+          { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
+          { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
+          { "<space>os", "<cmd>OpencodeSessions<cr>", desc = "Select opencode session" },
+        },
+        cmd = { "OpencodeSend", "OpencodeSwitchMode", "OpencodePrompt", "OpencodePane", "OpencodeSessions" },
+     }
+ <
 
 For advanced UI customization: >
     {
@@ -61,6 +68,10 @@ For advanced UI customization: >
         -- Tmux settings
         tmux_target = nil,
         auto_detect_pane = true,
+        auto_create_pane = true,
+        split_direction = "vertical",
+
+
 
         -- UI settings (place ui inside opts, not at top level)
         ui = {
@@ -73,18 +84,18 @@ For advanced UI customization: >
             margin = 2,           -- 2 line margin
             title_pos = "left",   -- Window title position to left
           },
-          split = {
-            position = "bottom",  -- "top", "bottom", "left", "right"
-            size = 8,             -- Split size
-          },
+         split = {
+           position = "bottom",  -- "top", "bottom", "left", "right"
+           size = 8,             -- Split size
+         },
+       },
+        keys = {
+          { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
+          { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
+          { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
+          { "<space>os", "<cmd>OpencodeSessions<cr>", desc = "Select opencode session" },
         },
-      },
-      keys = {
-        { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
-        { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
-        { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
-      },
-      cmd = { "OpencodeSend", "OpencodeSwitchMode", "OpencodePrompt" },
+        cmd = { "OpencodeSend", "OpencodeSwitchMode", "OpencodePrompt", "OpencodePane", "OpencodeSessions" },
     }
 <
 
@@ -124,6 +135,7 @@ VIM-PLUG                                               *opencode-context-vimplug
     vim.keymap.set("v", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
     vim.keymap.set("n", "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", { desc = "Toggle opencode mode" })
     vim.keymap.set("n", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open opencode persistent prompt" })
+    vim.keymap.set("n", "<space>os", "<cmd>OpencodeSessions<cr>", { desc = "Select opencode session" })
     EOF
 <
 
@@ -203,6 +215,18 @@ tmux_target                          string (default: nil)
 auto_detect_pane                     boolean (default: true)
     Auto-detect OpenCode pane in current window
 
+auto_create_pane                      boolean (default: true)
+    Auto-create OpenCode pane if not found
+
+split_direction                      string (default: "vertical")
+    Direction for new pane: "horizontal" or "vertical"
+
+server_hostname                      string (default: "127.0.0.1")
+    OpenCode server hostname for session management
+
+server_port                          number (default: 4096)
+    OpenCode server port for session management
+
 ------------------------------------------------------------------------------
 UI SETTINGS                                         *opencode-context-config-ui*
 
@@ -245,6 +269,12 @@ COMMANDS                                                *opencode-context-comman
 :OpencodePrompt                                         *:OpencodePrompt*
     Open OpenCode persistent prompt window
 
+:OpencodePane                                          *:OpencodePane*
+    Open a new OpenCode pane in tmux
+
+:OpencodeSessions                                      *:OpencodeSessions*
+    Select and open an OpenCode session from the server
+
 ==============================================================================
 KEYMAPS                                                 *opencode-context-keymaps*
 
@@ -255,6 +285,7 @@ Normal mode:
 <leader>oc                           Send prompt to OpenCode
 <leader>ot                           Toggle OpenCode mode
 <leader>op                           Open persistent prompt
+<space>os                            Select OpenCode session
 
 Visual mode:
 <leader>oc                           Send prompt to OpenCode (with @selection)
@@ -271,6 +302,15 @@ Use these placeholders in your prompts to include context:
 @selection                          Current visual selection content
 @range                              Current visual selection range
 @diagnostics                        LSP diagnostics for current line
+
+==============================================================================
+SESSION MANAGEMENT                                    *opencode-context-sessions*
+
+The plugin supports connecting to an OpenCode server for session management.
+Start the OpenCode server with `opencode serve`, then use `:OpencodeSessions`
+to select from available sessions and open a new tmux pane attached to that session.
+
+The server will be automatically started if not running when fetching sessions.
 
 ==============================================================================
 EXAMPLES                                                *opencode-context-examples*
@@ -290,6 +330,13 @@ Workflow example:
 2. Press `<leader>oc`
 3. Type: `"Explain this code: @selection"`
 4. Press Enter to send to OpenCode
+
+Session workflow:
+1. Start OpenCode server: `opencode serve`
+2. Create sessions in OpenCode
+3. In Neovim, press `<space>os` or run `:OpencodeSessions`
+4. Select a session from the list
+5. A new tmux pane opens attached to the selected session
 
 ==============================================================================
 TROUBLESHOOTING                                    *opencode-context-troubleshooting*

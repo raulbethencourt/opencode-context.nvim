@@ -12,6 +12,7 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
 - ✂️ `@selection`, `@range` - Insert visual selection
 - 🔍 `@diagnostics` - Insert LSP diagnostics
 - 🖥️ **Tmux integration** - Send directly to opencode pane in current window
+- 🔗 **Session management** - Select and attach to opencode sessions from server
 - ⚡ LazyVim compatible with lazy loading
 
 ## Requirements
@@ -19,6 +20,7 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
 - Neovim >= 0.8.0
 - `tmux` - Required for sending messages to running opencode sessions
 - `opencode` running in a pane within the same tmux window as Neovim
+- `opencode` server (for session management, optional)
 
 ## Installation
 
@@ -31,13 +33,14 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
     tmux_target = nil,  -- Manual override: "session:window.pane"
     auto_detect_pane = true,  -- Auto-detect opencode pane in current window
   },
-   keys = {
-     { "<leader>oc", "<cmd>OpencodeSend<cr>", desc = "Send prompt to opencode" },
-     { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = "v", desc = "Send prompt to opencode" },
-     { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
-     { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
-   },
-  cmd = { "OpencodeSend", "OpencodeSwitchMode" },
+    keys = {
+      { "<leader>oc", "<cmd>OpencodeSend<cr>", desc = "Send prompt to opencode" },
+      { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = "v", desc = "Send prompt to opencode" },
+      { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
+      { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
+      { "<space>os", "<cmd>OpencodeSessions<cr>", desc = "Select opencode session" },
+    },
+    cmd = { "OpencodeSend", "OpencodeSwitchMode", "OpencodePrompt", "OpencodePane", "OpencodeSessions" },
 }
 ```
 
@@ -72,6 +75,7 @@ vim.keymap.set("n", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt
 vim.keymap.set("v", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
 vim.keymap.set("n", "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", { desc = "Toggle opencode mode" })
 vim.keymap.set("n", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open opencode persistent prompt" })
+vim.keymap.set("n", "<space>os", "<cmd>OpencodeSessions<cr>", { desc = "Select opencode session" })
 EOF
 ```
 
@@ -135,12 +139,15 @@ EOF
 - `:OpencodeSend` - Open prompt input for opencode with placeholder support
 - `:OpencodeSwitchMode` - Toggle opencode between planning and build mode
 - `:OpencodePrompt` - Open opencode persistent prompt
+- `:OpencodePane` - Open a new opencode pane in tmux
+- `:OpencodeSessions` - Select and open an opencode session from the server
 
 ### Default Keymaps
 
 - `<leader>oc` - Open prompt input (works in normal and visual mode)
 - `<leader>ot` - Toggle opencode mode (planning ↔ build)
 - `<leader>op` - Toggle persistent prompt window
+- `<space>os` - Select opencode session
 
 ### Placeholders
 
@@ -173,6 +180,18 @@ Use these placeholders in your prompts to include context:
 5. Enter your prompt with placeholders: `"Fix this error: @diagnostics"`
 6. **See your prompt and response directly in the opencode pane!**
 
+### Session Management
+
+For advanced session management:
+
+1. Start the opencode server: `opencode serve`
+2. Create sessions in opencode
+3. In Neovim, press `<space>os` or run `:OpencodeSessions`
+4. Select a session from the list
+5. A new tmux pane opens attached to the selected session
+
+The server will be automatically started if not running when fetching sessions.
+
 ## Configuration
 
 ```lua
@@ -180,6 +199,12 @@ require("opencode-context").setup({
   -- Tmux settings
   tmux_target = nil,  -- Manual override: "main:1.0"
   auto_detect_pane = true,  -- Auto-find opencode pane in current window (default: true)
+  auto_create_pane = true,  -- Auto-create opencode pane if not found (default: true)
+  split_direction = "horizontal",  -- "horizontal" or "vertical" for new pane (default: "vertical")
+
+  -- Server settings
+  server_hostname = "127.0.0.1",  -- Opencode server hostname (default: "127.0.0.1")
+  server_port = 4096,  -- Opencode server port (default: 4096)
 
   -- UI settings
   ui = {
@@ -219,12 +244,14 @@ All UI options are optional and will use sensible defaults if not specified.
 
 ## How It Works
 
-The plugin integrates directly with tmux to send messages to your running opencode session:
+The plugin integrates directly with tmux to send messages to your running opencode pane:
 
 1. **Auto-detects** running opencode pane in the current tmux window
-2. **Sends keystrokes directly** to the opencode pane using `tmux send-keys`
-3. **You see the conversation** in real-time in your opencode interface
-4. **No new processes** - uses your existing opencode session
+2. **Auto-creates** a new opencode pane if none found (configurable)
+3. **Sends keystrokes directly** to the opencode pane using `tmux send-keys`
+4. **Supports placeholders** for rich context (@file, @selection, etc.)
+5. **You see the conversation** in real-time in your opencode interface
+6. **No new processes** - uses your existing opencode pane or creates new panes as needed
 
 ### Detection Strategy
 
