@@ -1,7 +1,6 @@
 local M = {}
 
 --- Default configuration options for the opencode-context plugin
---- @type table<string, any>
 M.defaults = {
 	-- Tmux settings
 	tmux_target = nil, -- Manual override: "session:window.pane"

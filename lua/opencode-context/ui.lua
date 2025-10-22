@@ -264,7 +264,7 @@ function M.toggle_persistent_prompt(send_callback)
 end
 
 --- Check if the prompt window is currently visible
---- @return boolean: true if prompt window exists and is valid, false otherwise
+--- @return nil|boolean: true if prompt window exists and is valid, false otherwise
 function M.is_prompt_visible()
 	return prompt_win and vim.api.nvim_win_is_valid(prompt_win)
 end

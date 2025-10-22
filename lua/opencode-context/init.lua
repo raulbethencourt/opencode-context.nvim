@@ -1,10 +1,8 @@
 local M = {}
 local ui = require("opencode-context.ui")
 local config = require("opencode-context.config")
-local context = require("opencode-context.context")
 local placeholders = require("opencode-context.placeholders")
 local tmux = require("opencode-context.tmux")
-local server = require("opencode-context.server")
 
 --- Send an interactive prompt to opencode with placeholder support
 --- Detects visual mode and pre-populates with @selection if applicable
