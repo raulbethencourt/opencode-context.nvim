@@ -6,7 +6,7 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
 
 - 💬 Interactive prompt input for opencode
 - 🔄 Smart placeholder replacement system
-- 📄 `@file` - Insert current file path (relative)
+- 📄 `@file` - Insert current file path relative to project root
 - 📁 `@buffers` - Insert all buffer file paths (relative)
 - 📍 `@cursor`, `@here` - Insert cursor position info
 - ✂️ `@selection`, `@range` - Insert visual selection
@@ -146,7 +146,7 @@ EOF
 
 Use these placeholders in your prompts to include context:
 
-- `@file` - Includes the current file path (relative to working directory)
+- `@file` - Includes the current file path relative to project root
 - `@buffers` - Includes all buffer file paths (relative to working directory)
 - `@cursor` - Includes cursor position (file, line, column)
 - `@here` - Alias to @cursor

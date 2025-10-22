@@ -264,7 +264,7 @@ PLACEHOLDERS                                          *opencode-context-placehol
 
 Use these placeholders in your prompts to include context:
 
-@file                               Current file path (relative)
+@file                               Current file path relative to project root
 @buffers                            All buffer file paths (relative)
 @cursor                             Cursor position info (file, line, column)
 @here                               Alias to @cursor

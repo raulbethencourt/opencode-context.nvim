@@ -1,8 +1,26 @@
 local M = {}
 
 local function get_current_file_path()
-	local bufnr = vim.api.nvim_get_current_buf()
+	local function is_floating(winid)
+		local config = vim.api.nvim_win_get_config(winid)
+		return config.relative ~= ""
+	end
+
+	local current_win = vim.api.nvim_get_current_win()
+	local target_win = current_win
+
+	if is_floating(current_win) then
+		local prev_winnr = vim.fn.winnr("#")
+		local prev_winid = vim.fn.win_getid(prev_winnr)
+
+		if prev_winid ~= 0 and vim.api.nvim_win_is_valid(prev_winid) then
+			target_win = prev_winid
+		end
+	end
+
+	local bufnr = vim.api.nvim_win_get_buf(target_win)
 	local filename = vim.api.nvim_buf_get_name(bufnr)
+
 	-- Convert to relative path from cwd
 	local relative_path = vim.fn.fnamemodify(filename, ":~:.")
 	return relative_path
@@ -67,7 +85,24 @@ local function get_cursor_info()
 end
 
 local function get_visual_selection()
-	local bufnr = vim.api.nvim_get_current_buf()
+	local function is_floating(winid)
+		local config = vim.api.nvim_win_get_config(winid)
+		return config.relative ~= ""
+	end
+
+	local current_win = vim.api.nvim_get_current_win()
+	local target_win = current_win
+
+	if is_floating(current_win) then
+		local prev_winnr = vim.fn.winnr("#")
+		local prev_winid = vim.fn.win_getid(prev_winnr)
+
+		if prev_winid ~= 0 and vim.api.nvim_win_is_valid(prev_winid) then
+			target_win = prev_winid
+		end
+	end
+
+	local bufnr = vim.api.nvim_win_get_buf(target_win)
 	local filename = vim.api.nvim_buf_get_name(bufnr)
 	local relative_path = vim.fn.fnamemodify(filename, ":~:.")
 
