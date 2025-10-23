@@ -44,7 +44,7 @@ LAZY.NVIM                                               *opencode-context-lazy*
 
 For basic usage: >
     {
-      "cousine/opencode-context.nvim",
+      "raulbethencourt/opencode-context.nvim",
        opts = {
          tmux_target = nil,
          auto_detect_pane = true,
@@ -54,60 +54,21 @@ For basic usage: >
         keys = {
           { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
           { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
-          { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
+          { "<leader>op", "<cmd>OpencodePrompt<cr>", mode = { "v", "n" }, desc = "Open opencode persistent prompt" },
           { "<space>os", "<cmd>OpencodeSessions<cr>", desc = "Select opencode session" },
+          { "<space>on", "<cmd>OpencodePane<cr>", desc = "Open new Opencode pane" },
         },
         cmd = { "OpencodeSend", "OpencodeSwitchMode", "OpencodePrompt", "OpencodePane", "OpencodeSessions" },
      }
  <
 
-For advanced UI customization: >
-    {
-      "cousine/opencode-context.nvim",
-      opts = {
-        -- Tmux settings
-        tmux_target = nil,
-        auto_detect_pane = true,
-        auto_create_pane = true,
-        split_direction = "vertical",
-
-
-
-        -- UI settings (place ui inside opts, not at top level)
-        ui = {
-          window_type = "float",  -- "float" or "split"
-          float = {
-            width = 0.6,          -- 60% of editor width
-            height = 1,           -- 1 line height
-            border = "rounded",   -- Rounded border style
-            position = "center",  -- Center the window
-            margin = 2,           -- 2 line margin
-            title_pos = "left",   -- Window title position to left
-          },
-         split = {
-           position = "bottom",  -- "top", "bottom", "left", "right"
-           size = 8,             -- Split size
-         },
-       },
-        keys = {
-          { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
-          { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
-          { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
-          { "<space>os", "<cmd>OpencodeSessions<cr>", desc = "Select opencode session" },
-        },
-        cmd = { "OpencodeSend", "OpencodeSwitchMode", "OpencodePrompt", "OpencodePane", "OpencodeSessions" },
-    }
-<
-
-IMPORTANT: The `ui` configuration must be placed inside the `opts` table, not
-at the top level of the lazy config.
 
 ------------------------------------------------------------------------------
 PACKER.NVIM                                             *opencode-context-packer*
 
 >
     use {
-      'cousine/opencode-context.nvim',
+      'raulbethencourt/opencode-context.nvim',
       config = function()
         require('opencode-context').setup({
           tmux_target = nil,
@@ -121,7 +82,7 @@ PACKER.NVIM                                             *opencode-context-packer
 VIM-PLUG                                               *opencode-context-vimplug*
 
 >
-    Plug 'cousine/opencode-context.nvim'
+    Plug 'raulbethencourt/opencode-context.nvim'
 
     " Configuration in init.vim or init.lua
     lua << EOF
@@ -135,7 +96,9 @@ VIM-PLUG                                               *opencode-context-vimplug
     vim.keymap.set("v", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
     vim.keymap.set("n", "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", { desc = "Toggle opencode mode" })
     vim.keymap.set("n", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open opencode persistent prompt" })
+    vim.keymap.set("v", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open opencode persistent prompt" })
     vim.keymap.set("n", "<space>os", "<cmd>OpencodeSessions<cr>", { desc = "Select opencode session" })
+    vim.keymap.set("n", "<space>on", "<cmd>OpencodePane<cr>", { desc = "Open new Opencode pane" })
     EOF
 <
 
@@ -143,7 +106,7 @@ VIM-PLUG                                               *opencode-context-vimplug
 DEIN.VIM                                               *opencode-context-dein*
 
 >
-    call dein#add('cousine/opencode-context.nvim')
+    call dein#add('raulbethencourt/opencode-context.nvim')
 
     " Configuration
     lua << EOF
@@ -169,7 +132,7 @@ MANUAL INSTALLATION                               *opencode-context-manual*
 
 1. Clone the repository to your Neovim configuration directory: >
 
-    git clone https://github.com/cousine/opencode-context.nvim ~/.config/nvim/pack/plugins/start/opencode-context.nvim
+    git clone https://github.com/raulbethencourt/opencode-context.nvim ~/.config/nvim/pack/plugins/start/opencode-context.nvim
 <
 
 2. Add to your `init.lua`: >
@@ -285,10 +248,12 @@ Normal mode:
 <leader>oc                           Send prompt to OpenCode
 <leader>ot                           Toggle OpenCode mode
 <leader>op                           Open persistent prompt
+<leader>on                           Open new pane in tmux
 <space>os                            Select OpenCode session
 
 Visual mode:
 <leader>oc                           Send prompt to OpenCode (with @selection)
+<leader>op                           Open persistent prompt (with @selection)
 
 ==============================================================================
 PLACEHOLDERS                                          *opencode-context-placeholders*

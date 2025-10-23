@@ -65,7 +65,13 @@ end, {
 local function create_keymaps()
 	vim.keymap.set({ "n", "v" }, "<leader>oc", opencode.send_prompt, { desc = "Send prompt to opencode" })
 	vim.keymap.set("n", "<leader>ot", opencode.toggle_mode, { desc = "Toggle opencode mode" })
-	vim.keymap.set("n", "<leader>op", opencode.toggle_persistent_prompt, { desc = "Toggle persistent opencode prompt" })
+	vim.keymap.set(
+		{ "n", "v" },
+		"<leader>op",
+		opencode.toggle_persistent_prompt,
+		{ desc = "Toggle persistent opencode prompt" }
+	)
+	vim.keymap.set("n", "<space>on", tmux.open_opencode_pane, { desc = "Open new Opencode pane" })
 	vim.keymap.set("n", "<space>os", server.select_session, { desc = "Select opencode session" })
 end
 

@@ -28,17 +28,17 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
 
 ```lua
 {
-  "cousine/opencode-context.nvim",
+  "raulbethencourt/opencode-context.nvim",
   opts = {
     tmux_target = nil,  -- Manual override: "session:window.pane"
     auto_detect_pane = true,  -- Auto-detect opencode pane in current window
   },
     keys = {
-      { "<leader>oc", "<cmd>OpencodeSend<cr>", desc = "Send prompt to opencode" },
-      { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = "v", desc = "Send prompt to opencode" },
+      { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
       { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
-      { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
+      { "<leader>op", "<cmd>OpencodePrompt<cr>", mode = { "v", "n" }, desc = "Open opencode persistent prompt" },
       { "<space>os", "<cmd>OpencodeSessions<cr>", desc = "Select opencode session" },
+      { "<space>on", "<cmd>OpencodePane<cr>", desc = "Open new Opencode pane" },
     },
     cmd = { "OpencodeSend", "OpencodeSwitchMode", "OpencodePrompt", "OpencodePane", "OpencodeSessions" },
 }
@@ -48,7 +48,7 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
 
 ```lua
 use {
-  'cousine/opencode-context.nvim',
+  'raulbethencourt/opencode-context.nvim',
   config = function()
     require('opencode-context').setup({
       tmux_target = nil,
@@ -61,7 +61,7 @@ use {
 ### vim-plug
 
 ```vim
-Plug 'cousine/opencode-context.nvim'
+Plug 'raulbethencourt/opencode-context.nvim'
 
 " Configuration in init.vim or init.lua
 lua << EOF
@@ -75,14 +75,16 @@ vim.keymap.set("n", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt
 vim.keymap.set("v", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
 vim.keymap.set("n", "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", { desc = "Toggle opencode mode" })
 vim.keymap.set("n", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open opencode persistent prompt" })
+vim.keymap.set("v", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open opencode persistent prompt" })
 vim.keymap.set("n", "<space>os", "<cmd>OpencodeSessions<cr>", { desc = "Select opencode session" })
+vim.keymap.set("n", "<space>on", "<cmd>OpencodePane<cr>", { desc = "Open new Opencode pane" })
 EOF
 ```
 
 ### dein.vim
 
 ```vim
-call dein#add('cousine/opencode-context.nvim')
+call dein#add('raulbethencourt/opencode-context.nvim')
 
 " Configuration
 lua << EOF
@@ -109,7 +111,7 @@ EOF
 1. Clone the repository to your Neovim configuration directory:
 
     ```bash
-    git clone https://github.com/cousine/opencode-context.nvim ~/.config/nvim/pack/plugins/start/opencode-context.nvim
+    git clone https://github.com/raulbethencourt/opencode-context.nvim ~/.config/nvim/pack/plugins/start/opencode-context.nvim
     ```
 
 2. Add to your `init.lua`:
@@ -147,7 +149,8 @@ EOF
 - `<leader>oc` - Open prompt input (works in normal and visual mode)
 - `<leader>ot` - Toggle opencode mode (planning ↔ build)
 - `<leader>op` - Toggle persistent prompt window
-- `<space>os` - Select opencode session
+- `<leader>on` - Open a new opencode pane in tmux
+- `<space>os`  - Select opencode session
 
 ### Placeholders
 
