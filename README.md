@@ -309,11 +309,19 @@ tmux send-keys -t session:window.pane "test message" Enter
 tmux list-panes -F '#{session_name}:#{window_index}.#{pane_index} #{pane_current_command}'
 ```
 
+## Todo
+
+- [ ] Add command "new"
+- [ ] Add command "export"
+- [ ] Add command "undo"
+- [ ] Add command "redo"
+- [ ] Add command "exit"
+- [ ] Add command "themes" with theme selection from neovim
+
 ## Documentation
 
 Once installed, you can access the full documentation with: >
     :help opencode-context
-<
 
 ## Contributing
 
