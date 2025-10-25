@@ -50,17 +50,26 @@ For basic usage: >
          auto_detect_pane = true,
          auto_create_pane = true,
          split_direction = "vertical",
-       },
-        keys = {
-          { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
-          { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
-          { "<leader>op", "<cmd>OpencodePrompt<cr>", mode = { "v", "n" }, desc = "Open opencode persistent prompt" },
-          { "<space>os", "<cmd>OpencodeSessions<cr>", desc = "Select opencode session" },
-          { "<space>on", "<cmd>OpencodePane<cr>", desc = "Open new Opencode pane" },
         },
-        cmd = { "OpencodeSend", "OpencodeSwitchMode", "OpencodePrompt", "OpencodePane", "OpencodeSessions" },
+         keys = {
+           { "<leader>oo", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
+           { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
+           { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
+           { "<leader>oi", "<cmd>OpencodeInit<cr>", desc = "Initialize opencode project" },
+           { "<leader>os", "<cmd>OpencodeSessions<cr>", desc = "Select opencode session" },
+           { "<leader>on", "<cmd>OpencodePane<cr>", desc = "Open new opencode pane" },
+           { "<leader>oc", "<cmd>OpencodeCompact<cr>", desc = "Compact opencode conversation" },
+         },
+        cmd = {
+          "OpencodeSend",
+          "OpencodeSwitchMode",
+          "OpencodePrompt",
+          "OpencodePane",
+          "OpencodeSessions",
+          "OpencodeInit",
+          "OpencodeCompact",	
+        },
      }
- <
 
 
 ------------------------------------------------------------------------------
@@ -92,13 +101,14 @@ VIM-PLUG                                               *opencode-context-vimplug
     })
 
     -- Keymaps
-    vim.keymap.set("n", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
-    vim.keymap.set("v", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
+    vim.keymap.set("n", "<leader>oo", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
+    vim.keymap.set("v", "<leader>oo", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
     vim.keymap.set("n", "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", { desc = "Toggle opencode mode" })
     vim.keymap.set("n", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open opencode persistent prompt" })
-    vim.keymap.set("v", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open opencode persistent prompt" })
-    vim.keymap.set("n", "<space>os", "<cmd>OpencodeSessions<cr>", { desc = "Select opencode session" })
-    vim.keymap.set("n", "<space>on", "<cmd>OpencodePane<cr>", { desc = "Open new Opencode pane" })
+    vim.keymap.set("n", "<leader>on", "<cmd>OpencodePane<cr>", { desc = "Open new opencode pane" })
+    vim.keymap.set("n", "<leader>os", "<cmd>OpencodeSessions<cr>", { desc = "Select opencode session" })
+    vim.keymap.set("n", "<leader>oi", "<cmd>OpencodeInit<cr>", { desc = "Select opencode session" })
+    vim.keymap.set("n", "<leader>oc", "<cmd>OpencodeCompact<cr>", { desc = "Compact opencode conversation" })
     EOF
 <
 
@@ -238,6 +248,12 @@ COMMANDS                                                *opencode-context-comman
 :OpencodeSessions                                      *:OpencodeSessions*
     Select and open an OpenCode session from the server
 
+:OpencodeInit                                          *:OpencodeInit*
+    Initialize OpenCode project if AGENTS.md is missing
+
+:OpencodeCompact                                       *:OpencodeCompact*
+    Compact conversation with agent
+
 ==============================================================================
 KEYMAPS                                                 *opencode-context-keymaps*
 
@@ -245,14 +261,16 @@ The plugin provides default keymaps when loaded. You can customize them in
 your configuration.
 
 Normal mode:
-<leader>oc                           Send prompt to OpenCode
+<leader>oo                           Send prompt to OpenCode
 <leader>ot                           Toggle OpenCode mode
 <leader>op                           Open persistent prompt
-<leader>on                           Open new pane in tmux
-<space>os                            Select OpenCode session
+<leader>on                           Open a new opencode pane
+<leader>os                           Select OpenCode session
+<leader>oi                           Initialize OpenCode project
+<leader>oc                           Initialize OpenCode project
 
 Visual mode:
-<leader>oc                           Send prompt to OpenCode (with @selection)
+<leader>oo                           Send prompt to OpenCode (with @selection)
 <leader>op                           Open persistent prompt (with @selection)
 
 ==============================================================================
@@ -292,14 +310,14 @@ Basic usage: >
 
 Workflow example:
 1. Select some code in visual mode
-2. Press `<leader>oc`
+2. Press `<leader>oo`
 3. Type: `"Explain this code: @selection"`
 4. Press Enter to send to OpenCode
 
 Session workflow:
 1. Start OpenCode server: `opencode serve`
 2. Create sessions in OpenCode
-3. In Neovim, press `<space>os` or run `:OpencodeSessions`
+3. In Neovim, press `<leader>os` or run `:OpencodeSessions`
 4. Select a session from the list
 5. A new tmux pane opens attached to the selected session
 

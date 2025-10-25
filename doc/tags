@@ -1,3 +1,5 @@
+:OpencodeCompact	opencode-context.txt	/*:OpencodeCompact*
+:OpencodeInit	opencode-context.txt	/*:OpencodeInit*
 :OpencodePane	opencode-context.txt	/*:OpencodePane*
 :OpencodePrompt	opencode-context.txt	/*:OpencodePrompt*
 :OpencodeSend	opencode-context.txt	/*:OpencodeSend*

@@ -34,13 +34,23 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
     auto_detect_pane = true,  -- Auto-detect opencode pane in current window
   },
     keys = {
-      { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
-      { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
-      { "<leader>op", "<cmd>OpencodePrompt<cr>", mode = { "v", "n" }, desc = "Open opencode persistent prompt" },
-      { "<space>os", "<cmd>OpencodeSessions<cr>", desc = "Select opencode session" },
-      { "<space>on", "<cmd>OpencodePane<cr>", desc = "Open new Opencode pane" },
+       { "<leader>oo", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
+       { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
+       { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
+       { "<leader>oi", "<cmd>OpencodeInit<cr>", desc = "Initialize opencode project" },
+       { "<leader>os", "<cmd>OpencodeSessions<cr>", desc = "Select opencode session" },
+       { "<leader>on", "<cmd>OpencodePane<cr>", desc = "Open new opencode pane" },
+       { "<leader>oc", "<cmd>OpencodeCompact<cr>", desc = "Compact opencode conversation" },
     },
-    cmd = { "OpencodeSend", "OpencodeSwitchMode", "OpencodePrompt", "OpencodePane", "OpencodeSessions" },
+    cmd = {
+      "OpencodeSend",
+      "OpencodeSwitchMode",
+      "OpencodePrompt",
+      "OpencodePane",
+      "OpencodeSessions",
+      "OpencodeInit",
+      "OpencodeCompact",
+    },
 }
 ```
 
@@ -71,13 +81,14 @@ require('opencode-context').setup({
 })
 
 -- Keymaps
-vim.keymap.set("n", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
-vim.keymap.set("v", "<leader>oc", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
+vim.keymap.set("n", "<leader>oo", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
+vim.keymap.set("v", "<leader>oo", "<cmd>OpencodeSend<cr>", { desc = "Send prompt to opencode" })
 vim.keymap.set("n", "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", { desc = "Toggle opencode mode" })
 vim.keymap.set("n", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open opencode persistent prompt" })
-vim.keymap.set("v", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open opencode persistent prompt" })
-vim.keymap.set("n", "<space>os", "<cmd>OpencodeSessions<cr>", { desc = "Select opencode session" })
-vim.keymap.set("n", "<space>on", "<cmd>OpencodePane<cr>", { desc = "Open new Opencode pane" })
+vim.keymap.set("n", "<leader>oi", "<cmd>OpencodeInit<cr>", { desc = "Initialize opencode project" })
+vim.keymap.set("n", "<leader>os", "<cmd>OpencodeSessions<cr>", { desc = "Select opencode session" })
+vim.keymap.set("n", "<leader>on", "<cmd>OpencodePane<cr>", { desc = "Open new opencode pane" })
+vim.keymap.set("n", "<leader>oc", "<cmd>OpencodeCompact<cr>", { desc = "Compact opencode conversation" })
 EOF
 ```
 
@@ -143,14 +154,18 @@ EOF
 - `:OpencodePrompt` - Open opencode persistent prompt
 - `:OpencodePane` - Open a new opencode pane in tmux
 - `:OpencodeSessions` - Select and open an opencode session from the server
+- `:OpencodeInit` - Initialize opencode project if AGENTS.md is missing
+- `:OpencodeCompact` - Compact conversation with agent
 
 ### Default Keymaps
 
-- `<leader>oc` - Open prompt input (works in normal and visual mode)
+- `<leader>oo` - Open prompt input (works in normal and visual mode)
 - `<leader>ot` - Toggle opencode mode (planning ↔ build)
 - `<leader>op` - Toggle persistent prompt window
-- `<leader>on` - Open a new opencode pane in tmux
-- `<space>os`  - Select opencode session
+- `<leader>on` - Open a new opencode pane
+- `<leader>os` - Select opencode session
+- `<leader>oi` - Initialize opencode project
+- `<leader>oc` - Compact conversation
 
 ### Placeholders
 
@@ -179,7 +194,7 @@ Use these placeholders in your prompts to include context:
 1. In tmux, split your window: `Ctrl-b %` or `Ctrl-b "`
 2. Start opencode in one pane: `opencode`
 3. Open Neovim in the other pane: `nvim`
-4. From Neovim, press `<leader>oc` to open the prompt input
+4. From Neovim, press `<leader>oo` to open the prompt input
 5. Enter your prompt with placeholders: `"Fix this error: @diagnostics"`
 6. **See your prompt and response directly in the opencode pane!**
 
@@ -189,7 +204,7 @@ For advanced session management:
 
 1. Start the opencode server: `opencode serve`
 2. Create sessions in opencode
-3. In Neovim, press `<space>os` or run `:OpencodeSessions`
+3. In Neovim, press `<leader>os` or run `:OpencodeSessions`
 4. Select a session from the list
 5. A new tmux pane opens attached to the selected session
 

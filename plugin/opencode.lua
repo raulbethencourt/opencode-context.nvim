@@ -59,11 +59,42 @@ end, {
 	desc = "Select and open an opencode session",
 })
 
+--- Create user command to initialize opencode project if AGENTS.md is missing
+--- Usage: :OpencodeInit
+vim.api.nvim_create_user_command("OpencodeInit", function()
+	if opencode.check_agents_md() then
+		vim.notify("AGENTS.md already exists", vim.log.levels.INFO)
+		return
+	end
+
+	local success = tmux.send_to_opencode("/init")
+	if success then
+		vim.notify("Opencode init command sent successfully", vim.log.levels.INFO)
+	else
+		vim.notify("Failed to send opencode init command", vim.log.levels.ERROR)
+	end
+end, {
+	desc = "Initialize opencode project if AGENTS.md is missing",
+})
+
+--- Create user command to compact conversation with agent
+--- Usage: :OpencodeCompact
+vim.api.nvim_create_user_command("OpencodeCompact", function()
+	local success = tmux.send_to_opencode("/compact")
+	if success then
+		vim.notify("Opencode compact command sent successfully", vim.log.levels.INFO)
+	else
+		vim.notify("Failed to send opencode compact command", vim.log.levels.ERROR)
+	end
+end, {
+	desc = "Initialize opencode project if AGENTS.md is missing",
+})
+
 --- Create default keymaps for opencode functionality
---- Sets up <leader>oc, <leader>ot, <leader>op, and <space>os keymaps
+--- Sets up <leader>oc, <leader>ot, <leader>op, <leader>oi, and <space>os keymaps
 --- @return nil
 local function create_keymaps()
-	vim.keymap.set({ "n", "v" }, "<leader>oc", opencode.send_prompt, { desc = "Send prompt to opencode" })
+	vim.keymap.set({ "n", "v" }, "<leader>oo", opencode.send_prompt, { desc = "Send prompt to opencode" })
 	vim.keymap.set("n", "<leader>ot", opencode.toggle_mode, { desc = "Toggle opencode mode" })
 	vim.keymap.set(
 		{ "n", "v" },
@@ -71,8 +102,10 @@ local function create_keymaps()
 		opencode.toggle_persistent_prompt,
 		{ desc = "Toggle persistent opencode prompt" }
 	)
-	vim.keymap.set("n", "<space>on", tmux.open_opencode_pane, { desc = "Open new Opencode pane" })
-	vim.keymap.set("n", "<space>os", server.select_session, { desc = "Select opencode session" })
+	vim.keymap.set("n", "<leader>oi", "<cmd>OpencodeInit<cr>", { desc = "Initialize opencode project" })
+	vim.keymap.set("n", "<leader>os", server.select_session, { desc = "Select opencode session" })
+	vim.keymap.set("n", "<leader>on", tmux.open_opencode_pane, { desc = "Open new opencode pane" })
+	vim.keymap.set("n", "<leader>oc", "<cmd>OpencodeCompact<cr>", { desc = "Compact opencode conversation" })
 end
 
 --- Setup keymaps after Vim has fully started to avoid conflicts

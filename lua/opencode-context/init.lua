@@ -91,4 +91,10 @@ function M.setup(opts)
 	config.setup(opts)
 end
 
+--- Check if AGENTS.md file exists in the current working directory
+--- @return boolean: true if AGENTS.md exists, false otherwise
+function M.check_agents_md()
+	return vim.fn.filereadable("AGENTS.md") == 1
+end
+
 return M
