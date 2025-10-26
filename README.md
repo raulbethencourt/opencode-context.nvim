@@ -19,7 +19,7 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
 
 - Neovim >= 0.8.0
 - `tmux` - Required for sending messages to running opencode sessions
-- `opencode` running in a pane within the same tmux window as Neovim
+- `opencode` running in a pane within the same tmux session as Neovim
 - `opencode` server (for session management, optional)
 
 ## Installation
@@ -31,7 +31,7 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
   "raulbethencourt/opencode-context.nvim",
   opts = {
     tmux_target = nil,  -- Manual override: "session:window.pane"
-    auto_detect_pane = true,  -- Auto-detect opencode pane in current window
+     auto_detect_pane = true,  -- Auto-detect opencode pane in current session
   },
     keys = {
        { "<leader>oo", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
@@ -226,7 +226,7 @@ Use these placeholders in your prompts to include context:
 
 ### Workflow Example
 
-1. In tmux, split your window: `Ctrl-b %` or `Ctrl-b "`
+1. In tmux, split your window/session: `Ctrl-b %` or `Ctrl-b "`
 2. Start opencode in one pane: `opencode`
 3. Open Neovim in the other pane: `nvim`
 4. From Neovim, press `<leader>oo` to open the prompt input
@@ -251,7 +251,7 @@ The server will be automatically started if not running when fetching sessions.
 require("opencode-context").setup({
   -- Tmux settings
   tmux_target = nil,  -- Manual override: "main:1.0"
-  auto_detect_pane = true,  -- Auto-find opencode pane in current window (default: true)
+   auto_detect_pane = true,  -- Auto-find opencode pane in current session (default: true)
   auto_create_pane = true,  -- Auto-create opencode pane if not found (default: true)
   split_direction = "horizontal",  -- "horizontal" or "vertical" for new pane (default: "vertical")
 
@@ -299,7 +299,7 @@ All UI options are optional and will use sensible defaults if not specified.
 
 The plugin integrates directly with tmux to send messages to your running opencode pane:
 
-1. **Auto-detects** running opencode pane in the current tmux window
+1. **Auto-detects** running opencode pane in the current tmux session
 2. **Auto-creates** a new opencode pane if none found (configurable)
 3. **Sends keystrokes directly** to the opencode pane using `tmux send-keys`
 4. **Supports placeholders** for rich context (@file, @selection, etc.)
@@ -308,22 +308,23 @@ The plugin integrates directly with tmux to send messages to your running openco
 
 ### Detection Strategy
 
-The plugin searches for opencode panes **only in the current tmux window** using:
+The plugin searches for opencode panes **only in the current tmux session** using:
 
-- Current command is `opencode`
+- Current command contains "opencode"
+- Start command contains "opencode"
 - Pane title contains "opencode"
-- Recent command history contains opencode
+- Excludes panes with "vim" or "nvim" in current command
 
 This ensures it finds the opencode instance you're actively working with, not some other session.
 
 ## Troubleshooting
 
-### "No opencode pane found in current window"
+### "No opencode pane found in session 'X'"
 
-- **Same window**: Ensure opencode is running in a pane in the **same tmux window** as Neovim
+- **Same session**: Ensure opencode is running in a pane in the **same tmux session** as Neovim
 - **Split window**: Use `Ctrl-b %` or `Ctrl-b "` to split and run opencode in one pane
 - **Manual target**: Set `tmux_target = "session:window.pane"` in config to override detection
-- **Verify opencode is running**: Check that opencode is actually running in the current window
+- **Verify opencode is running**: Check that opencode is actually running in the current session
 
 ### "Failed to send to opencode pane"
 
@@ -334,8 +335,8 @@ This ensures it finds the opencode instance you're actively working with, not so
 ### Debug Tips
 
 ```bash
-# Check if opencode pane is detected in current window
-tmux list-panes -F '#{session_name}:#{window_index}.#{pane_index}' -f '#{==:#{pane_current_command},opencode}'
+# Check if opencode pane is detected in current session
+tmux list-panes -sF '#{session_name}:#{window_index}.#{pane_index}|#{pane_current_command}|#{pane_start_command}|#{pane_title}' | grep -v vim | grep -v nvim | grep opencode
 
 # Test manual tmux send
 tmux send-keys -t session:window.pane "test message" Enter
@@ -351,8 +352,7 @@ tmux list-panes -F '#{session_name}:#{window_index}.#{pane_index} #{pane_current
 - [x] Add command "undo"
 - [x] Add command "redo"
 - [x] Add command "exit"
-- [ ] Add possibility to find pane in session
-- [ ] Add command "themes" with theme selection from neovim
+- [x] Add possibility to find pane in session
 
 ## Documentation
 
