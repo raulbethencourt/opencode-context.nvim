@@ -77,21 +77,34 @@ end, {
 	desc = "Initialize opencode project if AGENTS.md is missing",
 })
 
---- Create user command to compact conversation with agent
---- Usage: :OpencodeCompact
-vim.api.nvim_create_user_command("OpencodeCompact", function()
-	local success = tmux.send_to_opencode("/compact")
-	if success then
-		vim.notify("Opencode compact command sent successfully", vim.log.levels.INFO)
-	else
-		vim.notify("Failed to send opencode compact command", vim.log.levels.ERROR)
-	end
-end, {
-	desc = "Initialize opencode project if AGENTS.md is missing",
-})
+local cmd_list = {
+	compact = "Compact opencode conversation",
+	init = "Initialize opencode project",
+	details = "Toggle tool execution details",
+	exit = "Exit Opencode",
+	export = "Export current conversation to Markdown and open in your default editor",
+	redo = "Redo a previously undone message",
+	undo = "Undo last message in the conversation",
+	share = "Share current session",
+	unshare = "Unshare current session",
+}
+
+--- Create a list of opencode commands
+for cmd, description in pairs(cmd_list) do
+	-- Make first letter to uppercase for commands
+	vim.api.nvim_create_user_command("Opencode" .. cmd:gsub("^%l", string.upper), function()
+		local success = tmux.send_to_opencode("/" .. cmd)
+		if success then
+			vim.notify("Opencode compact command sent successfully", vim.log.levels.INFO)
+		else
+			vim.notify("Failed to send opencode compact command", vim.log.levels.ERROR)
+		end
+	end, {
+		desc = description,
+	})
+end
 
 --- Create default keymaps for opencode functionality
---- Sets up <leader>oc, <leader>ot, <leader>op, <leader>oi, and <space>os keymaps
 --- @return nil
 local function create_keymaps()
 	vim.keymap.set({ "n", "v" }, "<leader>oo", opencode.send_prompt, { desc = "Send prompt to opencode" })
@@ -102,10 +115,18 @@ local function create_keymaps()
 		opencode.toggle_persistent_prompt,
 		{ desc = "Toggle persistent opencode prompt" }
 	)
-	vim.keymap.set("n", "<leader>oi", "<cmd>OpencodeInit<cr>", { desc = "Initialize opencode project" })
-	vim.keymap.set("n", "<leader>os", server.select_session, { desc = "Select opencode session" })
+	vim.keymap.set("n", "<leader>ol", server.select_session, { desc = "Select opencode session" })
 	vim.keymap.set("n", "<leader>on", tmux.open_opencode_pane, { desc = "Open new opencode pane" })
-	vim.keymap.set("n", "<leader>oc", "<cmd>OpencodeCompact<cr>", { desc = "Compact opencode conversation" })
+	for cmd, description in pairs(cmd_list) do
+		vim.keymap.set(
+			"n",
+			"<leader>o" .. string.sub(cmd, 1, 1),
+			"<cmd>Opencode" .. cmd:gsub("^%l", string.upper) .. "<cr>",
+			{ desc = description }
+		)
+	end
+	vim.keymap.set("n", "<leader>ox", "<cmd>OpencodeExit<cr>", { desc = "Exit Opencode" })
+	vim.keymap.set("n", "<leader>ov", "<cmd>OpencodeUnshare<cr>", { desc = "Unshare current session" })
 end
 
 --- Setup keymaps after Vim has fully started to avoid conflicts

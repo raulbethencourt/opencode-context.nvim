@@ -51,24 +51,38 @@ For basic usage: >
          auto_create_pane = true,
          split_direction = "vertical",
         },
-         keys = {
-           { "<leader>oo", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
-           { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
-           { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
-           { "<leader>oi", "<cmd>OpencodeInit<cr>", desc = "Initialize opencode project" },
-           { "<leader>os", "<cmd>OpencodeSessions<cr>", desc = "Select opencode session" },
-           { "<leader>on", "<cmd>OpencodePane<cr>", desc = "Open new opencode pane" },
-           { "<leader>oc", "<cmd>OpencodeCompact<cr>", desc = "Compact opencode conversation" },
+          keys = {
+            { "<leader>oo", "<cmd>OpencodeSend<cr>", mode = { "v", "n" }, desc = "Send prompt to opencode" },
+            { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
+            { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
+            { "<leader>oi", "<cmd>OpencodeInit<cr>", desc = "Initialize opencode project" },
+            { "<leader>ol", "<cmd>OpencodeSessions<cr>", desc = "Select opencode session" },
+            { "<leader>on", "<cmd>OpencodePane<cr>", desc = "Open new opencode pane" },
+            { "<leader>oc", "<cmd>OpencodeCompact<cr>", desc = "Compact opencode conversation" },
+            { "<leader>od", "<cmd>OpencodeDetails<cr>", desc = "Toggle tool execution details" },
+            { "<leader>ox", "<cmd>OpencodeExit<cr>", desc = "Exit Opencode" },
+            { "<leader>oe", "<cmd>OpencodeExport<cr>", desc = "Export current conversation to Markdown" },
+            { "<leader>or", "<cmd>OpencodeRedo<cr>", desc = "Redo a previously undone message" },
+            { "<leader>ou", "<cmd>OpencodeUndo<cr>", desc = "Undo last message in the conversation" },
+            { "<leader>os", "<cmd>OpencodeShare<cr>", desc = "Share current session" },
+            { "<leader>ov", "<cmd>OpencodeUnshare<cr>", desc = "Unshare current session" },
+          },
+         cmd = {
+           "OpencodeSend",
+           "OpencodeSwitchMode",
+           "OpencodePrompt",
+           "OpencodePane",
+           "OpencodeSessions",
+           "OpencodeInit",
+           "OpencodeCompact",
+           "OpencodeDetails",
+           "OpencodeExit",
+           "OpencodeExport",
+           "OpencodeRedo",
+           "OpencodeUndo",
+           "OpencodeShare",
+           "OpencodeUnshare",
          },
-        cmd = {
-          "OpencodeSend",
-          "OpencodeSwitchMode",
-          "OpencodePrompt",
-          "OpencodePane",
-          "OpencodeSessions",
-          "OpencodeInit",
-          "OpencodeCompact",	
-        },
      }
 
 
@@ -106,9 +120,16 @@ VIM-PLUG                                               *opencode-context-vimplug
     vim.keymap.set("n", "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", { desc = "Toggle opencode mode" })
     vim.keymap.set("n", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open opencode persistent prompt" })
     vim.keymap.set("n", "<leader>on", "<cmd>OpencodePane<cr>", { desc = "Open new opencode pane" })
-    vim.keymap.set("n", "<leader>os", "<cmd>OpencodeSessions<cr>", { desc = "Select opencode session" })
-    vim.keymap.set("n", "<leader>oi", "<cmd>OpencodeInit<cr>", { desc = "Select opencode session" })
+    vim.keymap.set("n", "<leader>ol", "<cmd>OpencodeSessions<cr>", { desc = "Select opencode session" })
+    vim.keymap.set("n", "<leader>oi", "<cmd>OpencodeInit<cr>", { desc = "Initialize opencode project" })
     vim.keymap.set("n", "<leader>oc", "<cmd>OpencodeCompact<cr>", { desc = "Compact opencode conversation" })
+    vim.keymap.set("n", "<leader>od", "<cmd>OpencodeDetails<cr>", { desc = "Toggle tool execution details" })
+    vim.keymap.set("n", "<leader>ox", "<cmd>OpencodeExit<cr>", { desc = "Exit Opencode" })
+    vim.keymap.set("n", "<leader>oe", "<cmd>OpencodeExport<cr>", { desc = "Export current conversation to Markdown" })
+    vim.keymap.set("n", "<leader>or", "<cmd>OpencodeRedo<cr>", { desc = "Redo a previously undone message" })
+    vim.keymap.set("n", "<leader>ou", "<cmd>OpencodeUndo<cr>", { desc = "Undo last message in the conversation" })
+    vim.keymap.set("n", "<leader>os", "<cmd>OpencodeShare<cr>", { desc = "Share current session" })
+    vim.keymap.set("n", "<leader>ov", "<cmd>OpencodeUnshare<cr>", { desc = "Unshare current session" })
     EOF
 <
 
@@ -254,6 +275,27 @@ COMMANDS                                                *opencode-context-comman
 :OpencodeCompact                                       *:OpencodeCompact*
     Compact conversation with agent
 
+:OpencodeDetails                                       *:OpencodeDetails*
+    Toggle tool execution details
+
+:OpencodeExit                                          *:OpencodeExit*
+    Exit Opencode
+
+:OpencodeExport                                        *:OpencodeExport*
+    Export current conversation to Markdown and open in your default editor
+
+:OpencodeRedo                                          *:OpencodeRedo*
+    Redo a previously undone message
+
+:OpencodeUndo                                          *:OpencodeUndo*
+    Undo last message in the conversation
+
+:OpencodeShare                                         *:OpencodeShare*
+    Share current session
+
+:OpencodeUnshare                                       *:OpencodeUnshare*
+    Unshare current session
+
 ==============================================================================
 KEYMAPS                                                 *opencode-context-keymaps*
 
@@ -265,9 +307,16 @@ Normal mode:
 <leader>ot                           Toggle OpenCode mode
 <leader>op                           Open persistent prompt
 <leader>on                           Open a new opencode pane
-<leader>os                           Select OpenCode session
+<leader>ol                           Select OpenCode session
 <leader>oi                           Initialize OpenCode project
-<leader>oc                           Initialize OpenCode project
+<leader>oc                           Compact opencode conversation
+<leader>od                           Toggle tool execution details
+<leader>ox                           Exit Opencode
+<leader>oe                           Export current conversation to Markdown
+<leader>or                           Redo a previously undone message
+<leader>ou                           Undo last message in the conversation
+<leader>os                           Share current session
+<leader>ov                           Unshare current session
 
 Visual mode:
 <leader>oo                           Send prompt to OpenCode (with @selection)

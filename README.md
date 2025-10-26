@@ -38,9 +38,16 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
        { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
        { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
        { "<leader>oi", "<cmd>OpencodeInit<cr>", desc = "Initialize opencode project" },
-       { "<leader>os", "<cmd>OpencodeSessions<cr>", desc = "Select opencode session" },
+       { "<leader>ol", "<cmd>OpencodeSessions<cr>", desc = "Select opencode session" },
        { "<leader>on", "<cmd>OpencodePane<cr>", desc = "Open new opencode pane" },
        { "<leader>oc", "<cmd>OpencodeCompact<cr>", desc = "Compact opencode conversation" },
+       { "<leader>od", "<cmd>OpencodeDetails<cr>", desc = "Toggle tool execution details" },
+       { "<leader>ox", "<cmd>OpencodeExit<cr>", desc = "Exit Opencode" },
+       { "<leader>oe", "<cmd>OpencodeExport<cr>", desc = "Export current conversation to Markdown" },
+       { "<leader>or", "<cmd>OpencodeRedo<cr>", desc = "Redo a previously undone message" },
+       { "<leader>ou", "<cmd>OpencodeUndo<cr>", desc = "Undo last message in the conversation" },
+       { "<leader>os", "<cmd>OpencodeShare<cr>", desc = "Share current session" },
+       { "<leader>ov", "<cmd>OpencodeUnshare<cr>", desc = "Unshare current session" },
     },
     cmd = {
       "OpencodeSend",
@@ -50,6 +57,13 @@ A Neovim plugin that enables seamless context sharing with running opencode sess
       "OpencodeSessions",
       "OpencodeInit",
       "OpencodeCompact",
+      "OpencodeDetails",
+      "OpencodeExit",
+      "OpencodeExport",
+      "OpencodeRedo",
+      "OpencodeUndo",
+      "OpencodeShare",
+      "OpencodeUnshare",
     },
 }
 ```
@@ -86,9 +100,16 @@ vim.keymap.set("v", "<leader>oo", "<cmd>OpencodeSend<cr>", { desc = "Send prompt
 vim.keymap.set("n", "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", { desc = "Toggle opencode mode" })
 vim.keymap.set("n", "<leader>op", "<cmd>OpencodePrompt<cr>", { desc = "Open opencode persistent prompt" })
 vim.keymap.set("n", "<leader>oi", "<cmd>OpencodeInit<cr>", { desc = "Initialize opencode project" })
-vim.keymap.set("n", "<leader>os", "<cmd>OpencodeSessions<cr>", { desc = "Select opencode session" })
+vim.keymap.set("n", "<leader>ol", "<cmd>OpencodeSessions<cr>", { desc = "Select opencode session" })
 vim.keymap.set("n", "<leader>on", "<cmd>OpencodePane<cr>", { desc = "Open new opencode pane" })
 vim.keymap.set("n", "<leader>oc", "<cmd>OpencodeCompact<cr>", { desc = "Compact opencode conversation" })
+vim.keymap.set("n", "<leader>od", "<cmd>OpencodeDetails<cr>", { desc = "Toggle tool execution details" })
+vim.keymap.set("n", "<leader>ox", "<cmd>OpencodeExit<cr>", { desc = "Exit Opencode" })
+vim.keymap.set("n", "<leader>oe", "<cmd>OpencodeExport<cr>", { desc = "Export current conversation to Markdown" })
+vim.keymap.set("n", "<leader>or", "<cmd>OpencodeRedo<cr>", { desc = "Redo a previously undone message" })
+vim.keymap.set("n", "<leader>ou", "<cmd>OpencodeUndo<cr>", { desc = "Undo last message in the conversation" })
+vim.keymap.set("n", "<leader>os", "<cmd>OpencodeShare<cr>", { desc = "Share current session" })
+vim.keymap.set("n", "<leader>ov", "<cmd>OpencodeUnshare<cr>", { desc = "Unshare current session" })
 EOF
 ```
 
@@ -156,6 +177,13 @@ EOF
 - `:OpencodeSessions` - Select and open an opencode session from the server
 - `:OpencodeInit` - Initialize opencode project if AGENTS.md is missing
 - `:OpencodeCompact` - Compact conversation with agent
+- `:OpencodeDetails` - Toggle tool execution details
+- `:OpencodeExit` - Exit Opencode
+- `:OpencodeExport` - Export current conversation to Markdown and open in your default editor
+- `:OpencodeRedo` - Redo a previously undone message
+- `:OpencodeUndo` - Undo last message in the conversation
+- `:OpencodeShare` - Share current session
+- `:OpencodeUnshare` - Unshare current session
 
 ### Default Keymaps
 
@@ -163,9 +191,16 @@ EOF
 - `<leader>ot` - Toggle opencode mode (planning ↔ build)
 - `<leader>op` - Toggle persistent prompt window
 - `<leader>on` - Open a new opencode pane
-- `<leader>os` - Select opencode session
+- `<leader>ol` - Select opencode session
 - `<leader>oi` - Initialize opencode project
 - `<leader>oc` - Compact conversation
+- `<leader>od` - Toggle tool execution details
+- `<leader>ox` - Exit Opencode
+- `<leader>oe` - Export current conversation to Markdown
+- `<leader>or` - Redo a previously undone message
+- `<leader>ou` - Undo last message in the conversation
+- `<leader>os` - Share current session
+- `<leader>ov` - Unshare current session
 
 ### Placeholders
 
@@ -311,11 +346,11 @@ tmux list-panes -F '#{session_name}:#{window_index}.#{pane_index} #{pane_current
 
 ## Todo
 
-- [ ] Add command "new"
-- [ ] Add command "export"
-- [ ] Add command "undo"
-- [ ] Add command "redo"
-- [ ] Add command "exit"
+- [x] Add command "new"
+- [x] Add command "export"
+- [x] Add command "undo"
+- [x] Add command "redo"
+- [x] Add command "exit"
 - [ ] Add command "themes" with theme selection from neovim
 
 ## Documentation

@@ -1,10 +1,17 @@
 :OpencodeCompact	opencode-context.txt	/*:OpencodeCompact*
+:OpencodeDetails	opencode-context.txt	/*:OpencodeDetails*
+:OpencodeExit	opencode-context.txt	/*:OpencodeExit*
+:OpencodeExport	opencode-context.txt	/*:OpencodeExport*
 :OpencodeInit	opencode-context.txt	/*:OpencodeInit*
 :OpencodePane	opencode-context.txt	/*:OpencodePane*
 :OpencodePrompt	opencode-context.txt	/*:OpencodePrompt*
+:OpencodeRedo	opencode-context.txt	/*:OpencodeRedo*
 :OpencodeSend	opencode-context.txt	/*:OpencodeSend*
 :OpencodeSessions	opencode-context.txt	/*:OpencodeSessions*
+:OpencodeShare	opencode-context.txt	/*:OpencodeShare*
 :OpencodeSwitchMode	opencode-context.txt	/*:OpencodeSwitchMode*
+:OpencodeUndo	opencode-context.txt	/*:OpencodeUndo*
+:OpencodeUnshare	opencode-context.txt	/*:OpencodeUnshare*
 opencode-context	opencode-context.txt	/*opencode-context*
 opencode-context-commands	opencode-context.txt	/*opencode-context-commands*
 opencode-context-config	opencode-context.txt	/*opencode-context-config*
