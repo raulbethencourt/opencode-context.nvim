@@ -36,7 +36,7 @@ INSTALLATION                                          *opencode-context-install*
 Requirements:
 - Neovim >= 0.8.0
 - Tmux (required for sending messages to running OpenCode instances)
-- OpenCode running in a pane within the same tmux window as Neovim
+- OpenCode running in a pane within the same tmux session as Neovim
 - OpenCode server (for session management, optional)
 
 ------------------------------------------------------------------------------
@@ -188,7 +188,7 @@ MANUAL INSTALLATION                               *opencode-context-manual*
 ==============================================================================
 USAGE                                                      *opencode-context-usage*
 
-1. In tmux, split your window: `Ctrl-b %` or `Ctrl-b "`
+1. In tmux, split your window/session: `Ctrl-b %` or `Ctrl-b "`
 2. Start OpenCode in one pane: `opencode`
 3. Open Neovim in the other pane: `nvim`
 4. From Neovim, press `<leader>oc` to open the prompt input
@@ -207,7 +207,7 @@ tmux_target                          string (default: nil)
     Manual override for tmux target pane in format "session:window.pane"
 
 auto_detect_pane                     boolean (default: true)
-    Auto-detect OpenCode pane in current window
+    Auto-detect OpenCode pane in current session
 
 auto_create_pane                      boolean (default: true)
     Auto-create OpenCode pane if not found
@@ -373,12 +373,12 @@ Session workflow:
 ==============================================================================
 TROUBLESHOOTING                                    *opencode-context-troubleshooting*
 
-"No opencode pane found in current window"              *opencode-context-no-pane*
+"No opencode pane found in session 'X'"              *opencode-context-no-pane*
 
-- Ensure OpenCode is running in a pane in the same tmux window as Neovim
+- Ensure OpenCode is running in a pane in the same tmux session as Neovim
 - Use `Ctrl-b %` or `Ctrl-b "` to split and run OpenCode in one pane
 - Set `tmux_target = "session:window.pane"` to override detection
-- Verify OpenCode is actually running in the current window
+- Verify OpenCode is actually running in the current session
 
 "Failed to send to opencode pane"                       *opencode-context-send-failed*
 
@@ -389,7 +389,7 @@ TROUBLESHOOTING                                    *opencode-context-troubleshoo
 Debug commands: ~
 
 Check if OpenCode pane is detected: >
-    tmux list-panes -F '#{session_name}:#{window_index}.#{pane_index}' -f '#{==:#{pane_current_command},opencode}'
+    tmux list-panes -sF '#{session_name}:#{window_index}.#{pane_index}|#{pane_current_command}|#{pane_start_command}|#{pane_title}' | grep -v vim | grep -v nvim | grep opencode
 <
 
 Test manual tmux send: >
