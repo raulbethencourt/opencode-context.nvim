@@ -83,10 +83,10 @@ local cmd_list = {
 	details = "Toggle tool execution details",
 	exit = "Exit Opencode",
 	export = "Export current conversation to Markdown and open in your default editor",
+	unshare = "Unshare current session",
+	share = "Share current session",
 	redo = "Redo a previously undone message",
 	undo = "Undo last message in the conversation",
-	share = "Share current session",
-	unshare = "Unshare current session",
 }
 
 --- Create a list of opencode commands
