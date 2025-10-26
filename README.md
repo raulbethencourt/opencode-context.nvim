@@ -351,6 +351,7 @@ tmux list-panes -F '#{session_name}:#{window_index}.#{pane_index} #{pane_current
 - [x] Add command "undo"
 - [x] Add command "redo"
 - [x] Add command "exit"
+- [ ] Add possibility to find pane in session
 - [ ] Add command "themes" with theme selection from neovim
 
 ## Documentation
